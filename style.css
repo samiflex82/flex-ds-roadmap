@@ -604,6 +604,35 @@ h1 { font-size: 16px; font-weight: 600; color: #f0eeff; }
 }
 .keydates-grid input:focus { border-color: #5550c0; }
 
+/* ─── Read-only mode ─── */
+#readonly-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 20px;
+  background: #1a1630;
+  border-bottom: 1px solid #332f52;
+  font-size: 12px;
+  color: #a78bfa;
+}
+#btn-edit-copy {
+  font-size: 11px;
+  padding: 4px 12px;
+  border-radius: 4px;
+  border: 1px solid #5550c0;
+  background: #3d3580;
+  color: #e8e6ff;
+  cursor: pointer;
+}
+#btn-edit-copy:hover { background: #4b47a0; }
+body.readonly #btn-add,
+body.readonly #btn-manage,
+body.readonly #btn-reset,
+body.readonly #btn-import-label { display: none !important; }
+body.readonly .resize-handle,
+body.readonly .link-handle { display: none !important; }
+body.readonly .card { cursor: default !important; }
+
 /* ─── Scrollbar ─── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: #0f0f14; }

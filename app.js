@@ -14,6 +14,7 @@ const V_GAP  = 6;   // px vertical gap between stacked cards
 const LANE_PAD = 8; // px top/bottom padding inside a swimlane
 
 let SEED = null;    // bundled data.json (for reset / version compare)
+let READONLY = false;  // true when loaded from a snapshot link
 
 // ─── State ───────────────────────────────────────────────────────────────────
 let DATA = null;       // loaded from data.json or localStorage
@@ -346,17 +347,20 @@ function buildCard(item, weeks, track) {
     <div class="resize-handle"></div>
   `;
 
-  // Click to edit (not drag/connect)
-  card.addEventListener('click', e => {
-    if (card.classList.contains('dragging')) return;
-    if (e.target.classList.contains('resize-handle')) return;
-    if (e.target.classList.contains('link-handle')) return;
-    openModal(item.id);
-  });
-
-  setupDrag(card, item, weeks);
-  setupResize(card.querySelector('.resize-handle'), item, weeks);
-  setupConnect(card.querySelector('.link-handle'), item, weeks);
+  // Click to edit (not drag/connect); skip entirely in read-only mode
+  if (!READONLY) {
+    card.addEventListener('click', e => {
+      if (card.classList.contains('dragging')) return;
+      if (e.target.classList.contains('resize-handle')) return;
+      if (e.target.classList.contains('link-handle')) return;
+      openModal(item.id);
+    });
+    setupDrag(card, item, weeks);
+    setupResize(card.querySelector('.resize-handle'), item, weeks);
+    setupConnect(card.querySelector('.link-handle'), item, weeks);
+  } else {
+    card.style.cursor = 'default';
+  }
   return card;
 }
 
@@ -908,20 +912,87 @@ document.querySelectorAll('.add-row').forEach(btn => {
   };
 });
 
+// ─── Snapshot encode/decode (gzip+base64url → URL hash) ─────────────────────
+async function encodeSnapshot(data) {
+  const json = new TextEncoder().encode(JSON.stringify(data));
+  try {
+    const cs = new CompressionStream('gzip');
+    const writer = cs.writable.getWriter();
+    writer.write(json);
+    writer.close();
+    const chunks = [];
+    const reader = cs.readable.getReader();
+    for (;;) { const { done, value } = await reader.read(); if (done) break; chunks.push(value); }
+    const buf = new Uint8Array(chunks.reduce((n, c) => n + c.length, 0));
+    let off = 0; chunks.forEach(c => { buf.set(c, off); off += c.length; });
+    let s = ''; buf.forEach(b => s += String.fromCharCode(b));
+    return 'g:' + btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+  } catch {
+    // fallback: raw base64url (no compression, older browsers)
+    let s = ''; json.forEach(b => s += String.fromCharCode(b));
+    return 'r:' + btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+  }
+}
+
+async function decodeSnapshot(payload) {
+  const prefix = payload.slice(0, 2);
+  const b64 = payload.slice(2).replace(/-/g,'+').replace(/_/g,'/');
+  const binary = atob(b64);
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  if (prefix === 'g:') {
+    const ds = new DecompressionStream('gzip');
+    const writer = ds.writable.getWriter();
+    writer.write(bytes);
+    writer.close();
+    const chunks = [];
+    const reader = ds.readable.getReader();
+    for (;;) { const { done, value } = await reader.read(); if (done) break; chunks.push(value); }
+    const buf = new Uint8Array(chunks.reduce((n, c) => n + c.length, 0));
+    let off = 0; chunks.forEach(c => { buf.set(c, off); off += c.length; });
+    return JSON.parse(new TextDecoder().decode(buf));
+  }
+  return JSON.parse(new TextDecoder().decode(bytes));
+}
+
+// ─── Read-only banner (shown when READONLY = true) ───────────────────────────
+function showReadonlyBanner() {
+  const b = document.createElement('div');
+  b.id = 'readonly-banner';
+  b.innerHTML = `
+    <span>📋 Read-only snapshot</span>
+    <button id="btn-edit-copy">Edit a copy</button>
+  `;
+  document.getElementById('header').after(b);
+  document.getElementById('btn-edit-copy').onclick = () => {
+    localStorage.setItem('flex-ds-roadmap', JSON.stringify(DATA));
+    location.hash = '';
+    location.reload();
+  };
+}
+
 // ─── Share ────────────────────────────────────────────────────────────────────
-document.getElementById('btn-share').onclick = () => {
-  const url = window.location.href.split('?')[0];
+document.getElementById('btn-share').onclick = async () => {
   const old = document.getElementById('share-banner');
   if (old) { old.remove(); return; }
+  const payload = await encodeSnapshot(DATA);
+  const base = window.location.href.split('#')[0].split('?')[0];
+  const url = base + '#s=' + payload;
   const banner = document.createElement('div');
   banner.id = 'share-banner';
   banner.innerHTML = `
-    <span>Share link (read-only when opened)</span>
-    <input type="text" value="${url}" readonly onclick="this.select()" />
-    <button onclick="navigator.clipboard.writeText('${url}').then(()=>{this.textContent='Copied!';setTimeout(()=>this.textContent='Copy',1500)})">Copy</button>
+    <span>Snapshot link — opens read-only for anyone</span>
+    <input id="snapshot-url" type="text" value="${url}" readonly onclick="this.select()" />
+    <button id="snap-copy">Copy</button>
     <button onclick="this.closest('#share-banner').remove()">✕</button>
   `;
   document.body.appendChild(banner);
+  document.getElementById('snap-copy').onclick = function() {
+    navigator.clipboard.writeText(url).then(() => {
+      this.textContent = 'Copied!';
+      setTimeout(() => { this.textContent = 'Copy'; }, 1500);
+    });
+  };
 };
 
 // ─── Migration (non-destructive: keep the user's edits, layer in new structure) ─
@@ -986,7 +1057,21 @@ function scrollToCurrentWeek() {
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 async function boot() {
-  // always fetch bundled seed so we can migrate / reset against it
+  // Check for snapshot hash first — if present, decode and show read-only
+  const hash = location.hash;
+  if (hash.startsWith('#s=')) {
+    try {
+      DATA = await decodeSnapshot(hash.slice(3));
+      READONLY = true;
+      document.body.classList.add('readonly');
+      render();
+      showReadonlyBanner();
+      scrollToCurrentWeek();
+      return;
+    } catch { /* corrupt/too-old hash — fall through to normal load */ }
+  }
+
+  // Normal boot: fetch bundled seed, migrate localStorage
   try {
     const resp = await fetch('./data.json', { cache: 'no-store' });
     SEED = await resp.json();
@@ -997,11 +1082,11 @@ async function boot() {
   if (saved) { try { parsed = JSON.parse(saved); } catch {} }
 
   if (parsed) {
-    migrate(parsed);          // in-place, non-destructive — never wipes her edits
+    migrate(parsed);          // in-place, non-destructive — never wipes edits
     DATA = parsed;
     save();
   } else {
-    DATA = SEED;              // fresh browser → use the committed baseline (her exported board)
+    DATA = SEED;              // fresh browser → use committed baseline
   }
   render();
   scrollToCurrentWeek();

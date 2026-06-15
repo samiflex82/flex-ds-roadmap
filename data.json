@@ -167,26 +167,10 @@
   ],
   "items": [
     {
-      "id": 1,
-      "phase": "P1",
-      "workstream": "color",
-      "title": "Component color cleanup — spec ticket",
-      "owner": "sami",
-      "handsOffTo": [
-        "amanda"
-      ],
-      "status": "to-ticket",
-      "start": "2026-06-15",
-      "end": "2026-06-26",
-      "linear": "",
-      "notes": "",
-      "linksTo": []
-    },
-    {
       "id": 2,
       "phase": "P1",
       "workstream": "color",
-      "title": "VQA + remap outliers",
+      "title": "Color Tokens: VQA + remap outliers",
       "owner": "sami",
       "handsOffTo": [
         "amanda"
@@ -256,13 +240,11 @@
         "amanda"
       ],
       "status": "in-design",
-      "start": "2026-07-06",
-      "end": "2026-07-11",
+      "start": "2026-07-13",
+      "end": "2026-07-17",
       "linear": "",
       "notes": "",
-      "linksTo": [
-        22
-      ]
+      "linksTo": []
     },
     {
       "id": 12,
@@ -278,9 +260,7 @@
       "end": "2026-06-19",
       "linear": "",
       "notes": "Kickoff of handoff chain",
-      "linksTo": [
-        31
-      ]
+      "linksTo": []
     },
     {
       "id": 13,
@@ -296,15 +276,13 @@
       "end": "2026-06-19",
       "linear": "",
       "notes": "Pending",
-      "linksTo": [
-        15
-      ]
+      "linksTo": []
     },
     {
       "id": 15,
       "phase": "P1",
       "workstream": "type",
-      "title": "Type Token Remap + Cleanup",
+      "title": "Figma: Type Token Remap + Cleanup",
       "owner": "sami",
       "handsOffTo": [
         "amanda"
@@ -324,8 +302,8 @@
       "owner": "amanda",
       "handsOffTo": [],
       "status": "done",
-      "start": "2026-06-15",
-      "end": "2026-06-19",
+      "start": "2026-06-08",
+      "end": "2026-06-12",
       "linear": "DS-179",
       "notes": "",
       "linksTo": []
@@ -338,8 +316,8 @@
       "owner": "amanda",
       "handsOffTo": [],
       "status": "done",
-      "start": "2026-06-15",
-      "end": "2026-06-19",
+      "start": "2026-06-08",
+      "end": "2026-06-12",
       "linear": "DS-175",
       "notes": "",
       "linksTo": []
@@ -348,12 +326,12 @@
       "id": 18,
       "phase": "P1",
       "workstream": "color",
-      "title": "VQA cleanup color tokens",
+      "title": "Color Tokens: Remap outliers in Code based on VQA",
       "owner": "amanda",
       "handsOffTo": [],
       "status": "in-development",
       "start": "2026-06-22",
-      "end": "2026-07-10",
+      "end": "2026-07-08",
       "linear": "",
       "notes": "",
       "linksTo": []
@@ -366,8 +344,8 @@
       "owner": "amanda",
       "handsOffTo": [],
       "status": "to-ticket",
-      "start": "2026-07-13",
-      "end": "2026-07-18",
+      "start": "2026-07-20",
+      "end": "2026-07-25",
       "linear": "",
       "notes": "",
       "linksTo": []
@@ -380,8 +358,8 @@
       "owner": "amanda",
       "handsOffTo": [],
       "status": "done",
-      "start": "2026-06-15",
-      "end": "2026-06-19",
+      "start": "2026-06-05",
+      "end": "2026-06-09",
       "linear": "DS-182",
       "notes": "",
       "linksTo": []
@@ -391,7 +369,7 @@
       "phase": "P1",
       "workstream": "brand",
       "title": "Gradient Illo: Update in Code",
-      "owner": "amanda",
+      "owner": "sami",
       "handsOffTo": [],
       "status": "to-ticket",
       "start": "2026-07-06",
@@ -421,9 +399,9 @@
       "title": "Left alignment to text stacks",
       "owner": "amanda",
       "handsOffTo": [],
-      "status": "done",
-      "start": "2026-06-15",
-      "end": "2026-06-19",
+      "status": "next-up",
+      "start": "2026-07-03",
+      "end": "2026-07-07",
       "linear": "",
       "notes": "",
       "linksTo": []
@@ -484,9 +462,7 @@
       "end": "2026-06-26",
       "linear": "",
       "notes": "From Sami container spec",
-      "linksTo": [
-        25
-      ]
+      "linksTo": []
     },
     {
       "id": 32,
@@ -535,20 +511,6 @@
       "linksTo": []
     },
     {
-      "id": 35,
-      "phase": "P1",
-      "workstream": "color",
-      "title": "Color Migrate in Code",
-      "owner": "amanda",
-      "handsOffTo": [],
-      "status": "backlog",
-      "start": "2026-06-15",
-      "end": "2026-06-15",
-      "linear": "",
-      "notes": "",
-      "linksTo": []
-    },
-    {
       "id": 36,
       "phase": "P1",
       "workstream": "color",
@@ -557,10 +519,80 @@
       "handsOffTo": [],
       "status": "to-ticket",
       "start": "2026-06-15",
-      "end": "2026-06-22",
+      "end": "2026-06-19",
       "linear": "",
       "notes": "",
       "linksTo": []
+    },
+    {
+      "id": 37,
+      "phase": "P1",
+      "workstream": "color",
+      "title": "Figma: Color Token Migration",
+      "owner": "sami",
+      "handsOffTo": [],
+      "linksTo": [],
+      "status": "in-design",
+      "start": "2026-06-29",
+      "end": "2026-07-05",
+      "linear": "",
+      "notes": ""
+    },
+    {
+      "id": 38,
+      "phase": "P1",
+      "workstream": "color",
+      "title": "Type Token Audit + Remapping Ticket",
+      "owner": "sami",
+      "handsOffTo": [],
+      "linksTo": [],
+      "status": "next-up",
+      "start": "2026-06-22",
+      "end": "2026-06-26",
+      "linear": "",
+      "notes": ""
+    },
+    {
+      "id": 39,
+      "phase": "P1",
+      "workstream": "color",
+      "title": "Figma: Icons",
+      "owner": "sami",
+      "handsOffTo": [],
+      "linksTo": [],
+      "status": "backlog",
+      "start": "2026-07-27",
+      "end": "2026-07-31",
+      "linear": "",
+      "notes": ""
+    },
+    {
+      "id": 40,
+      "phase": "P1",
+      "workstream": "brand",
+      "title": "Gradient Back Removal Decisions",
+      "owner": "emily",
+      "handsOffTo": [],
+      "linksTo": [],
+      "status": "backlog",
+      "start": "2026-06-22",
+      "end": "2026-06-26",
+      "linear": "",
+      "notes": ""
+    },
+    {
+      "id": 41,
+      "phase": "P1",
+      "workstream": "brand",
+      "title": "Update in Code Gradient Removal Decision",
+      "owner": "amanda",
+      "handsOffTo": [],
+      "linksTo": [],
+      "status": "backlog",
+      "start": "2026-07-13",
+      "end": "2026-07-16",
+      "linear": "",
+      "notes": ""
     }
   ]
 }
