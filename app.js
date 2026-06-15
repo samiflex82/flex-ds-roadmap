@@ -156,8 +156,8 @@ function renderWeekHeaders(weeks) {
 }
 
 function renderFilters() {
-  const allPhases    = DATA.phases.map(p => p.id);
-  const allStatuses  = DATA.statuses.map(s => s.id);
+  const allPhases    = (DATA.phases   || []).map(p => p.id);
+  const allStatuses  = (DATA.statuses || []).map(s => s.id);
   const allWS        = DATA.workstreams.map(w => w.id);
 
   function makeGroup(containerId, values, filterSet, labelFn, colorFn) {
@@ -190,7 +190,7 @@ function renderFilters() {
 function renderLegend() {
   const c = document.getElementById('legend-swatches');
   c.innerHTML = '';
-  DATA.statuses.forEach(s => {
+  (DATA.statuses || []).forEach(s => {
     const span = document.createElement('span');
     span.className = 'legend-swatch';
     span.textContent = s.label;
@@ -766,7 +766,12 @@ async function boot() {
         parsed.meta.seedVersion = seedV;
         DATA = parsed; save(); render(); return;
       }
-      DATA = parsed; render(); return;
+      // migrate: if old data is missing statuses/phases, graft from seed silently
+      if (SEED && (!parsed.statuses || !parsed.phases)) {
+        parsed.statuses = SEED.statuses;
+        parsed.phases   = SEED.phases;
+      }
+      DATA = parsed; save(); render(); return;
     }
   }
   // no saved state → use seed
