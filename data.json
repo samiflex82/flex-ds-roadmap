@@ -1,11 +1,12 @@
 {
   "meta": {
     "title": "Flex DS — Dark Matter Roadmap",
-    "seedVersion": 3,
+    "seedVersion": 4,
     "codeCompleteDate": "2026-07-24",
     "deployDate": "2026-07-29",
     "startDate": "2026-06-15",
-    "timelineStart": "2026-06-01"
+    "timelineStart": "2026-06-01",
+    "linearOrg": "get-flex"
   },
   "people": [
     {
@@ -43,56 +44,56 @@
     {
       "id": "backlog",
       "label": "Backlog",
-      "bg": "#1f2430",
-      "fg": "#9aa3b8"
+      "bg": "#242424",
+      "fg": "#AEB2BA"
     },
     {
       "id": "blocked",
       "label": "Blocked",
-      "bg": "#431407",
-      "fg": "#fdba74"
+      "bg": "#321410",
+      "fg": "#F6A88F"
     },
     {
       "id": "planned",
       "label": "Planned",
-      "bg": "#1e293b",
-      "fg": "#94a3b8"
+      "bg": "#13243A",
+      "fg": "#8FBCE8"
     },
     {
       "id": "next-up",
       "label": "Next up",
-      "bg": "#312e81",
-      "fg": "#c7d2fe"
+      "bg": "#1C2740",
+      "fg": "#A9C2F0"
     },
     {
       "id": "to-ticket",
       "label": "To ticket",
-      "bg": "#1c1c3a",
-      "fg": "#a5b4fc"
+      "bg": "#241A3A",
+      "fg": "#C4B5FD"
     },
     {
       "id": "in-design",
       "label": "In design",
-      "bg": "#2d1b5e",
-      "fg": "#c4b5fd"
+      "bg": "#2A1D4D",
+      "fg": "#CBB6FF"
     },
     {
       "id": "in-development",
       "label": "In development",
-      "bg": "#0f3d3a",
-      "fg": "#5eead4"
+      "bg": "#11301F",
+      "fg": "#5FD29A"
     },
     {
       "id": "in-review",
       "label": "In review",
-      "bg": "#422006",
-      "fg": "#fcd34d"
+      "bg": "#2E2410",
+      "fg": "#FFE07A"
     },
     {
       "id": "done",
       "label": "Done",
-      "bg": "#134e2a",
-      "fg": "#86efac"
+      "bg": "#123524",
+      "fg": "#6FE0A0"
     }
   ],
   "phases": [
@@ -113,55 +114,55 @@
     {
       "id": "color",
       "label": "Color Token Remap",
-      "color": "#6366F1",
+      "color": "#6A3DB8",
       "icon": "🎨"
     },
     {
       "id": "icons",
       "label": "Icons",
-      "color": "#F59E0B",
+      "color": "#FFE988",
       "icon": "🔣"
     },
     {
       "id": "component",
       "label": "Components",
-      "color": "#10B981",
+      "color": "#14874F",
       "icon": "🧩"
     },
     {
       "id": "brand",
       "label": "Brand",
-      "color": "#EC4899",
+      "color": "#E5451D",
       "icon": "✨"
     },
     {
       "id": "type",
       "label": "Type",
-      "color": "#8B5CF6",
+      "color": "#005AA7",
       "icon": "🔤"
     },
     {
       "id": "spacing",
       "label": "Spacing",
-      "color": "#06B6D4",
+      "color": "#8D9199",
       "icon": "↔️"
     },
     {
       "id": "shape",
       "label": "Shape / Radii",
-      "color": "#84CC16",
+      "color": "#106C41",
       "icon": "⬛"
     },
     {
       "id": "templates",
       "label": "Templates",
-      "color": "#F97316",
+      "color": "#94420C",
       "icon": "🗂️"
     },
     {
       "id": "onebill",
       "label": "OneBill",
-      "color": "#A78BFA",
+      "color": "#6B5E82",
       "icon": "🧾"
     }
   ],
@@ -180,7 +181,7 @@
       "end": "2026-07-02",
       "linear": "",
       "notes": "",
-      "linksTo": []
+      "blocking": []
     },
     {
       "id": 3,
@@ -196,7 +197,7 @@
       "end": "2026-06-19",
       "linear": "",
       "notes": "Pending",
-      "linksTo": []
+      "blocking": []
     },
     {
       "id": 4,
@@ -212,7 +213,7 @@
       "end": "2026-06-19",
       "linear": "",
       "notes": "Pending",
-      "linksTo": []
+      "blocking": []
     },
     {
       "id": 7,
@@ -228,7 +229,7 @@
       "end": "2026-06-19",
       "linear": "",
       "notes": "Pending",
-      "linksTo": []
+      "blocking": []
     },
     {
       "id": 8,
@@ -244,7 +245,7 @@
       "end": "2026-07-17",
       "linear": "",
       "notes": "",
-      "linksTo": []
+      "blocking": []
     },
     {
       "id": 12,
@@ -260,7 +261,7 @@
       "end": "2026-06-19",
       "linear": "",
       "notes": "Kickoff of handoff chain",
-      "linksTo": []
+      "blocking": []
     },
     {
       "id": 13,
@@ -276,7 +277,7 @@
       "end": "2026-06-19",
       "linear": "",
       "notes": "Pending",
-      "linksTo": []
+      "blocking": []
     },
     {
       "id": 15,
@@ -292,7 +293,7 @@
       "end": "2026-07-04",
       "linear": "",
       "notes": "Label token cleanup — spec",
-      "linksTo": []
+      "blocking": []
     },
     {
       "id": 16,
@@ -306,7 +307,7 @@
       "end": "2026-06-12",
       "linear": "DS-179",
       "notes": "",
-      "linksTo": []
+      "blocking": []
     },
     {
       "id": 17,
@@ -320,7 +321,7 @@
       "end": "2026-06-12",
       "linear": "DS-175",
       "notes": "",
-      "linksTo": []
+      "blocking": []
     },
     {
       "id": 18,
@@ -334,7 +335,7 @@
       "end": "2026-07-08",
       "linear": "",
       "notes": "",
-      "linksTo": []
+      "blocking": []
     },
     {
       "id": 22,
@@ -348,7 +349,7 @@
       "end": "2026-07-25",
       "linear": "",
       "notes": "",
-      "linksTo": []
+      "blocking": []
     },
     {
       "id": 24,
@@ -362,7 +363,7 @@
       "end": "2026-06-09",
       "linear": "DS-182",
       "notes": "",
-      "linksTo": []
+      "blocking": []
     },
     {
       "id": 25,
@@ -376,7 +377,7 @@
       "end": "2026-07-11",
       "linear": "",
       "notes": "After Emily export",
-      "linksTo": []
+      "blocking": []
     },
     {
       "id": 26,
@@ -390,7 +391,7 @@
       "end": "2026-07-08",
       "linear": "",
       "notes": "",
-      "linksTo": []
+      "blocking": []
     },
     {
       "id": 27,
@@ -404,7 +405,7 @@
       "end": "2026-07-07",
       "linear": "",
       "notes": "",
-      "linksTo": []
+      "blocking": []
     },
     {
       "id": 28,
@@ -418,7 +419,7 @@
       "end": "2026-07-04",
       "linear": "",
       "notes": "",
-      "linksTo": []
+      "blocking": []
     },
     {
       "id": 29,
@@ -432,7 +433,7 @@
       "end": "2026-08-07",
       "linear": "",
       "notes": "",
-      "linksTo": []
+      "blocking": []
     },
     {
       "id": 30,
@@ -446,7 +447,7 @@
       "end": "2026-08-07",
       "linear": "",
       "notes": "",
-      "linksTo": []
+      "blocking": []
     },
     {
       "id": 31,
@@ -462,7 +463,7 @@
       "end": "2026-06-26",
       "linear": "",
       "notes": "From Sami container spec",
-      "linksTo": []
+      "blocking": []
     },
     {
       "id": 32,
@@ -478,7 +479,7 @@
       "end": "2026-06-19",
       "linear": "",
       "notes": "Blocks type remap",
-      "linksTo": []
+      "blocking": []
     },
     {
       "id": 33,
@@ -494,7 +495,7 @@
       "end": "2026-08-07",
       "linear": "",
       "notes": "Alerts/Forms/Loading/Onboarding",
-      "linksTo": []
+      "blocking": []
     },
     {
       "id": 34,
@@ -508,7 +509,7 @@
       "end": "2026-08-07",
       "linear": "",
       "notes": "TBD",
-      "linksTo": []
+      "blocking": []
     },
     {
       "id": 36,
@@ -522,7 +523,7 @@
       "end": "2026-06-19",
       "linear": "",
       "notes": "",
-      "linksTo": []
+      "blocking": []
     },
     {
       "id": 37,
@@ -531,12 +532,12 @@
       "title": "Figma: Color Token Migration",
       "owner": "sami",
       "handsOffTo": [],
-      "linksTo": [],
       "status": "in-design",
       "start": "2026-06-29",
       "end": "2026-07-05",
       "linear": "",
-      "notes": ""
+      "notes": "",
+      "blocking": []
     },
     {
       "id": 38,
@@ -545,12 +546,12 @@
       "title": "Type Token Audit + Remapping Ticket",
       "owner": "sami",
       "handsOffTo": [],
-      "linksTo": [],
       "status": "next-up",
       "start": "2026-06-22",
       "end": "2026-06-26",
       "linear": "",
-      "notes": ""
+      "notes": "",
+      "blocking": []
     },
     {
       "id": 39,
@@ -559,12 +560,12 @@
       "title": "Figma: Icons",
       "owner": "sami",
       "handsOffTo": [],
-      "linksTo": [],
       "status": "backlog",
       "start": "2026-07-27",
       "end": "2026-07-31",
       "linear": "",
-      "notes": ""
+      "notes": "",
+      "blocking": []
     },
     {
       "id": 40,
@@ -573,12 +574,12 @@
       "title": "Gradient Back Removal Decisions",
       "owner": "emily",
       "handsOffTo": [],
-      "linksTo": [],
       "status": "backlog",
       "start": "2026-06-22",
       "end": "2026-06-26",
       "linear": "",
-      "notes": ""
+      "notes": "",
+      "blocking": []
     },
     {
       "id": 41,
@@ -587,12 +588,12 @@
       "title": "Update in Code Gradient Removal Decision",
       "owner": "amanda",
       "handsOffTo": [],
-      "linksTo": [],
       "status": "backlog",
       "start": "2026-07-13",
       "end": "2026-07-16",
       "linear": "",
-      "notes": ""
+      "notes": "",
+      "blocking": []
     }
   ]
 }

@@ -119,6 +119,18 @@ function escapeHtml(s) {
     ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 }
 
+// Build a Linear issue URL from an ID (DS-179) or pass through a full URL.
+function linearUrl(v) {
+  if (!v) return null;
+  const s = String(v).trim();
+  if (/^https?:\/\//i.test(s)) return s;
+  if (/^[A-Za-z]+-\d+$/.test(s)) {
+    const org = (DATA.meta && DATA.meta.linearOrg) || 'get-flex';
+    return `https://linear.app/${org}/issue/${s.toUpperCase()}`;
+  }
+  return null;
+}
+
 // ─── Persistence ─────────────────────────────────────────────────────────────
 function save() {
   localStorage.setItem('flex-ds-roadmap', JSON.stringify(DATA));
@@ -337,23 +349,30 @@ function buildCard(item, weeks, track) {
   card.style.borderColor = 'rgba(255,255,255,0.1)';
   if (ws) { card.style.borderLeft = `3px solid ${ws.color}`; }
 
-  const linear = item.linear ? ` · ${item.linear}` : '';
   const wsIcon = ws?.icon ? `${ws.icon} ` : '';
+  const lUrl = linearUrl(item.linear);
+  const linearHtml = item.linear
+    ? (lUrl ? ` · <a class="card-link" href="${escapeHtml(lUrl)}" target="_blank" rel="noopener">${escapeHtml(item.linear)}</a>`
+            : ` · ${escapeHtml(item.linear)}`)
+    : '';
   card.innerHTML = `
     <div class="card-title">${wsIcon}${escapeHtml(item.title)}</div>
-    <div class="card-meta">${statusLabel(item.status)}${linear}</div>
-    ${item.handsOffTo?.length ? '<div class="card-handoff-dot" title="Has handoff"></div>' : ''}
-    <div class="link-handle" title="Drag to another card to connect"></div>
+    <div class="card-meta">${escapeHtml(statusLabel(item.status))}${linearHtml}</div>
+    <div class="link-handle" title="Drag to another card to set a dependency"></div>
     <div class="resize-handle"></div>
   `;
+  // Linear link opens without triggering the card's edit-panel click
+  const a = card.querySelector('.card-link');
+  if (a) a.addEventListener('click', e => e.stopPropagation());
 
-  // Click to edit (not drag/connect); skip entirely in read-only mode
+  // Click to edit (not drag/connect/link); skip entirely in read-only mode
   if (!READONLY) {
     card.addEventListener('click', e => {
       if (card.classList.contains('dragging')) return;
       if (e.target.classList.contains('resize-handle')) return;
       if (e.target.classList.contains('link-handle')) return;
-      openModal(item.id);
+      if (e.target.classList.contains('card-link')) return;
+      openPanel(item.id);
     });
     setupDrag(card, item, weeks);
     setupResize(card.querySelector('.resize-handle'), item, weeks);
@@ -386,6 +405,7 @@ function setupDrag(card, item, weeks) {
       card.classList.add('dragging');
       card.style.left = (origLeft + dx) + 'px';
       card.style.top  = (origTop + dy) + 'px';   // follow cursor vertically too
+      scheduleArrowRedraw(weeks);                // arrows track the card live
     }
 
     function onUp(e) {
@@ -432,7 +452,7 @@ function setupConnect(handle, item, weeks) {
     // temp line in the arrows svg layer
     let svg = document.getElementById('arrows-svg');
     const tmp = document.createElementNS('http://www.w3.org/2000/svg','path');
-    tmp.setAttribute('stroke', '#7c6fcd');
+    tmp.setAttribute('stroke', '#6A3DB8');
     tmp.setAttribute('stroke-width', '2');
     tmp.setAttribute('fill', 'none');
     if (svg) svg.appendChild(tmp);
@@ -459,10 +479,10 @@ function setupConnect(handle, item, weeks) {
       if (targetCard) {
         const targetId = Number(targetCard.dataset.id);
         if (targetId !== item.id) {
-          item.linksTo = item.linksTo || [];
-          const i = item.linksTo.indexOf(targetId);
-          if (i >= 0) item.linksTo.splice(i, 1);   // toggle off if already linked
-          else item.linksTo.push(targetId);
+          item.blocking = item.blocking || [];
+          const i = item.blocking.indexOf(targetId);
+          if (i >= 0) item.blocking.splice(i, 1);   // toggle off if already linked
+          else item.blocking.push(targetId);        // this item blocks the target
           save();
           render();
         }
@@ -485,6 +505,7 @@ function setupResize(handle, item, weeks) {
       const dx = e.clientX - startX;
       const newW = Math.max(20, origWidth + dx);
       card.style.width = newW + 'px';
+      scheduleArrowRedraw(weeks);
     }
 
     function onUp(e) {
@@ -507,7 +528,13 @@ function setupResize(handle, item, weeks) {
   });
 }
 
-// ─── Handoff arrows ───────────────────────────────────────────────────────────
+// ─── Dependency arrows ────────────────────────────────────────────────────────
+let _arrowRAF = null;
+function scheduleArrowRedraw(weeks) {
+  if (_arrowRAF) return;
+  _arrowRAF = requestAnimationFrame(() => { _arrowRAF = null; renderArrows(weeks); });
+}
+
 function renderArrows(weeks) {
   const old = document.getElementById('arrows-svg');
   if (old) old.remove();
@@ -541,11 +568,11 @@ function renderArrows(weeks) {
   const scrollTop  = document.getElementById('timeline-wrap').scrollTop;
 
   items.forEach(item => {
-    if (!item.linksTo?.length) return;
+    if (!item.blocking?.length) return;
     const fromCard = document.querySelector(`.card[data-id="${item.id}"]`);
     if (!fromCard) return;
 
-    item.linksTo.forEach(toId => {
+    item.blocking.forEach(toId => {
       if (!visibleIds.has(toId)) return;            // target filtered out — skip
       const toCard = document.querySelector(`.card[data-id="${toId}"]`);
       if (!toCard) return;
@@ -565,7 +592,7 @@ function renderArrows(weeks) {
       // visible line
       const line = document.createElementNS('http://www.w3.org/2000/svg','path');
       line.setAttribute('d', d);
-      line.setAttribute('stroke', 'rgba(167,139,250,0.55)');
+      line.setAttribute('stroke', 'rgba(124,79,208,0.6)');
       line.setAttribute('stroke-width', '1.5');
       line.setAttribute('fill', 'none');
       line.setAttribute('stroke-dasharray', '4 3');
@@ -581,8 +608,9 @@ function renderArrows(weeks) {
       hit.style.cursor = 'pointer';
       hit.style.pointerEvents = 'stroke';
       hit.addEventListener('click', () => {
-        if (!confirm('Remove this connection?')) return;
-        item.linksTo = item.linksTo.filter(id => id !== toId);
+        if (READONLY) return;
+        if (!confirm('Remove this dependency?')) return;
+        item.blocking = item.blocking.filter(id => id !== toId);
         save();
         render();
       });
@@ -591,130 +619,138 @@ function renderArrows(weeks) {
   });
 }
 
-// ─── Modal ────────────────────────────────────────────────────────────────────
-function openModal(itemId) {
+// ─── Edit side panel ──────────────────────────────────────────────────────────
+function depLabel(it) { return `${it.title} — ${personById(it.owner)?.name || ''}`; }
+
+// Live-edited dependency chips (Blocking + Blocked by)
+function renderDeps(item) {
+  const itemById = id => DATA.items.find(x => x.id === id);
+  item.blocking = item.blocking || [];
+
+  const blockingBox  = document.getElementById('f-blocking');
+  const blockedbyBox = document.getElementById('f-blockedby');
+  const blockingAdd  = document.getElementById('f-blocking-add');
+  const blockedbyAdd = document.getElementById('f-blockedby-add');
+
+  const chip = (it, id) =>
+    `<span class="dep-chip"><span>${escapeHtml(depLabel(it))}</span><span class="chip-x" data-id="${id}">×</span></span>`;
+
+  // Blocking: items THIS one blocks
+  const blk = item.blocking.map(itemById).filter(Boolean);
+  blockingBox.innerHTML = blk.length ? blk.map(t => chip(t, t.id)).join('') : '<span class="dep-empty">None</span>';
+  blockingBox.querySelectorAll('.chip-x').forEach(x => x.onclick = () => {
+    item.blocking = item.blocking.filter(id => id !== Number(x.dataset.id));
+    save(); renderDeps(item); render();
+  });
+
+  // Blocked by: items whose blocking includes this id (derived)
+  const blockers = DATA.items.filter(o => (o.blocking || []).includes(item.id));
+  blockedbyBox.innerHTML = blockers.length ? blockers.map(o => chip(o, o.id)).join('') : '<span class="dep-empty">None</span>';
+  blockedbyBox.querySelectorAll('.chip-x').forEach(x => x.onclick = () => {
+    const src = itemById(Number(x.dataset.id));
+    if (src) src.blocking = (src.blocking || []).filter(id => id !== item.id);
+    save(); renderDeps(item); render();
+  });
+
+  // Add pickers
+  const opt = it => `<option value="${it.id}">${escapeHtml(depLabel(it))}</option>`;
+  blockingAdd.innerHTML = '<option value="">＋ Add item this blocks…</option>' +
+    DATA.items.filter(it => it.id !== item.id && !item.blocking.includes(it.id)).map(opt).join('');
+  blockingAdd.onchange = () => {
+    const id = Number(blockingAdd.value); if (!id) return;
+    item.blocking.push(id); save(); renderDeps(item); render();
+  };
+  blockedbyAdd.innerHTML = '<option value="">＋ Add item that blocks this…</option>' +
+    DATA.items.filter(it => it.id !== item.id && !(it.blocking || []).includes(item.id)).map(opt).join('');
+  blockedbyAdd.onchange = () => {
+    const id = Number(blockedbyAdd.value); if (!id) return;
+    const src = itemById(id); if (src) { src.blocking = src.blocking || []; src.blocking.push(item.id); }
+    save(); renderDeps(item); render();
+  };
+}
+
+function openPanel(itemId) {
   editingId = itemId;
   const item = DATA.items.find(i => i.id === itemId);
   const isNew = !item;
 
-  document.getElementById('modal-title').textContent = isNew ? 'New item' : 'Edit item';
+  document.getElementById('panel-title').textContent = isNew ? 'New item' : 'Edit item';
 
-  // populate owner select
-  const ownerSel = document.getElementById('f-owner');
-  ownerSel.innerHTML = DATA.people.map(p =>
-    `<option value="${p.id}" ${!isNew && item.owner===p.id ? 'selected' : ''}>${p.name}</option>`
-  ).join('');
-
-  // workstream select
-  const wsSel = document.getElementById('f-workstream');
-  wsSel.innerHTML = DATA.workstreams.map(w =>
-    `<option value="${w.id}" ${!isNew && item.workstream===w.id ? 'selected' : ''}>${w.label}</option>`
-  ).join('');
-
-  // handoff select
-  const hSel = document.getElementById('f-handoff');
-  hSel.innerHTML = DATA.people.map(p =>
-    `<option value="${p.id}" ${!isNew && item.handsOffTo?.includes(p.id) ? 'selected' : ''}>${p.name}</option>`
-  ).join('');
-
-  // connects-to select (all other items, owner-prefixed)
-  const linkSel = document.getElementById('f-linksto');
-  linkSel.innerHTML = DATA.items
-    .filter(it => it.id !== itemId)
-    .map(it => {
-      const owner = personById(it.owner)?.name || '';
-      const sel = !isNew && item.linksTo?.includes(it.id) ? 'selected' : '';
-      return `<option value="${it.id}" ${sel}>${escapeHtml(it.title)} — ${escapeHtml(owner)}</option>`;
-    }).join('');
-
-  // phase select (data-driven)
+  document.getElementById('f-owner').innerHTML = DATA.people.map(p =>
+    `<option value="${p.id}" ${!isNew && item.owner===p.id ? 'selected' : ''}>${escapeHtml(p.name)}</option>`).join('');
+  document.getElementById('f-workstream').innerHTML = DATA.workstreams.map(w =>
+    `<option value="${w.id}" ${!isNew && item.workstream===w.id ? 'selected' : ''}>${escapeHtml((w.icon?w.icon+' ':'')+w.label)}</option>`).join('');
   document.getElementById('f-phase').innerHTML = DATA.phases.map(p =>
-    `<option value="${p.id}">${p.label}</option>`).join('');
-  // status select (data-driven)
+    `<option value="${p.id}">${escapeHtml(p.label)}</option>`).join('');
   document.getElementById('f-status').innerHTML = DATA.statuses.map(s =>
-    `<option value="${s.id}">${s.label}</option>`).join('');
+    `<option value="${s.id}">${escapeHtml(s.label)}</option>`).join('');
 
   document.getElementById('f-title').value   = item?.title   || '';
-  document.getElementById('f-phase').value   = item?.phase   || DATA.phases[0]?.id   || 'P1';
-  document.getElementById('f-status').value  = item?.status  || DATA.statuses[0]?.id || 'to-ticket';
-  document.getElementById('f-start').value   = item?.start   || DATA.meta.startDate;
-  document.getElementById('f-end').value     = item?.end     || DATA.meta.startDate;
-  document.getElementById('f-linear').value  = item?.linear  || '';
-  document.getElementById('f-notes').value   = item?.notes   || '';
+  document.getElementById('f-phase').value    = item?.phase   || DATA.phases[0]?.id   || 'P1';
+  document.getElementById('f-status').value   = item?.status  || DATA.statuses[0]?.id || 'backlog';
+  document.getElementById('f-start').value    = item?.start   || DATA.meta.startDate;
+  document.getElementById('f-end').value      = item?.end     || DATA.meta.startDate;
+  document.getElementById('f-linear').value   = item?.linear  || '';
+  document.getElementById('f-notes').value    = item?.notes   || '';
 
-  document.getElementById('modal-delete').style.display = isNew ? 'none' : '';
-  document.getElementById('modal-overlay').classList.remove('hidden');
+  // Dependencies: only for saved items (need an id to relate to)
+  const depBlocks = document.querySelectorAll('#panel .dep-block');
+  depBlocks.forEach(b => b.style.display = isNew ? 'none' : '');
+  if (!isNew) renderDeps(item);
+
+  document.getElementById('panel-delete').style.display = isNew ? 'none' : '';
+  document.getElementById('panel-overlay').classList.add('open');
 }
 
-document.getElementById('modal-cancel').onclick = closeModal;
-document.getElementById('modal-overlay').onclick = e => {
-  if (e.target === document.getElementById('modal-overlay')) closeModal();
+document.getElementById('panel-cancel').onclick = closePanel;
+document.getElementById('panel-overlay').onclick = e => {
+  if (e.target === document.getElementById('panel-overlay')) closePanel();
 };
 
-document.getElementById('modal-save').onclick = () => {
+document.getElementById('panel-save').onclick = () => {
   const title = document.getElementById('f-title').value.trim();
   if (!title) { alert('Title required'); return; }
-  const handoff = [...document.getElementById('f-handoff').selectedOptions].map(o => o.value);
-  const linksTo = [...document.getElementById('f-linksto').selectedOptions].map(o => Number(o.value));
-
+  const fields = {
+    title,
+    phase:      document.getElementById('f-phase').value,
+    workstream: document.getElementById('f-workstream').value,
+    owner:      document.getElementById('f-owner').value,
+    status:     document.getElementById('f-status').value,
+    start:      document.getElementById('f-start').value,
+    end:        document.getElementById('f-end').value,
+    linear:     document.getElementById('f-linear').value.trim(),
+    notes:      document.getElementById('f-notes').value.trim(),
+  };
   if (editingId === null) {
-    // new item
     const newId = Math.max(0, ...DATA.items.map(i => i.id)) + 1;
-    DATA.items.push({
-      id: newId,
-      phase:      document.getElementById('f-phase').value,
-      workstream: document.getElementById('f-workstream').value,
-      title,
-      owner:      document.getElementById('f-owner').value,
-      handsOffTo: handoff,
-      linksTo,
-      status:     document.getElementById('f-status').value,
-      start:      document.getElementById('f-start').value,
-      end:        document.getElementById('f-end').value,
-      linear:     document.getElementById('f-linear').value.trim(),
-      notes:      document.getElementById('f-notes').value.trim(),
-    });
+    DATA.items.push({ id: newId, ...fields, blocking: [] });
   } else {
-    const item = DATA.items.find(i => i.id === editingId);
-    Object.assign(item, {
-      title,
-      phase:      document.getElementById('f-phase').value,
-      workstream: document.getElementById('f-workstream').value,
-      owner:      document.getElementById('f-owner').value,
-      handsOffTo: handoff,
-      linksTo,
-      status:     document.getElementById('f-status').value,
-      start:      document.getElementById('f-start').value,
-      end:        document.getElementById('f-end').value,
-      linear:     document.getElementById('f-linear').value.trim(),
-      notes:      document.getElementById('f-notes').value.trim(),
-    });
+    Object.assign(DATA.items.find(i => i.id === editingId), fields);
   }
   save();
-  closeModal();
+  closePanel();
   render();
 };
 
-document.getElementById('modal-delete').onclick = () => {
+document.getElementById('panel-delete').onclick = () => {
   if (!confirm('Delete this item?')) return;
   const goneId = editingId;
   DATA.items = DATA.items.filter(i => i.id !== goneId);
-  // drop any connections pointing at the deleted item
-  DATA.items.forEach(i => { if (i.linksTo) i.linksTo = i.linksTo.filter(id => id !== goneId); });
+  DATA.items.forEach(i => { if (i.blocking) i.blocking = i.blocking.filter(id => id !== goneId); });
   save();
-  closeModal();
+  closePanel();
   render();
 };
 
-function closeModal() {
+function closePanel() {
   editingId = null;
-  document.getElementById('modal-overlay').classList.add('hidden');
+  document.getElementById('panel-overlay').classList.remove('open');
 }
 
 // ─── Add button ───────────────────────────────────────────────────────────────
 document.getElementById('btn-add').onclick = () => {
   editingId = null;
-  openModal(null);
+  openPanel(null);
 };
 
 // ─── Export / Import ──────────────────────────────────────────────────────────
@@ -1004,8 +1040,8 @@ function seedLinksFromHandoff(items) {
         it.workstream === item.workstream &&
         parseDate(it.start) >= parseDate(item.end)
       );
-      if (target && target.id !== item.id && !item.linksTo.includes(target.id)) {
-        item.linksTo.push(target.id);
+      if (target && target.id !== item.id && !item.blocking.includes(target.id)) {
+        item.blocking.push(target.id);
       }
     });
   });
@@ -1023,24 +1059,37 @@ function migrate(data) {
     // global taxonomy: adopt the new status list (safe — it's config, not her item data)
     if (SEED?.statuses) data.statuses = SEED.statuses;
     if (!data.phases) data.phases = SEED?.phases || [{id:'P1',label:'P1'},{id:'P2',label:'P2'},{id:'P3',label:'P3'}];
-    // merge workstream icons by id without touching her labels/colors
     const iconById = {};
     (SEED?.workstreams || []).forEach(w => { if (w.icon) iconById[w.id] = w.icon; });
     (data.workstreams || []).forEach(w => { if (!w.icon && iconById[w.id]) w.icon = iconById[w.id]; });
     if (SEED?.meta?.timelineStart && !data.meta.timelineStart) data.meta.timelineStart = SEED.meta.timelineStart;
   }
 
-  // per-item: remap statuses, default phase, ensure arrays
+  // per-item: remap statuses, default phase, rename linksTo → blocking, ensure arrays
   data.items.forEach(it => {
     it.status = statusRemap[it.status] ?? (it.status || 'backlog');
     if (!it.phase) it.phase = 'P1';
-    it.handsOffTo = it.handsOffTo || [];
-    if (!Array.isArray(it.linksTo)) it.linksTo = [];
+    if (it.linksTo && !it.blocking) it.blocking = it.linksTo;   // v3→v4 rename
+    delete it.linksTo;
+    if (!Array.isArray(it.blocking)) it.blocking = [];
+    if (!Array.isArray(it.handsOffTo)) it.handsOffTo = [];
   });
-  // if she had no explicit links yet, convert today's auto-arrows into editable ones (once)
-  if (v < 3 && !data.items.some(it => it.linksTo.length)) seedLinksFromHandoff(data.items);
+  if (v < 3 && !data.items.some(it => it.blocking.length)) seedLinksFromHandoff(data.items);
 
-  data.meta.seedVersion = Math.max(v, SEED?.meta?.seedVersion ?? v, 3);
+  // v<4: Flex black-theme refresh — re-apply seed status colors + workstream colors (preserve custom entries/labels)
+  if (v < 4) {
+    if (SEED?.statuses) {
+      const byId = Object.fromEntries(SEED.statuses.map(s => [s.id, s]));
+      (data.statuses || []).forEach(s => { if (byId[s.id]) { s.bg = byId[s.id].bg; s.fg = byId[s.id].fg; } });
+    }
+    if (SEED?.workstreams) {
+      const byId = Object.fromEntries(SEED.workstreams.map(w => [w.id, w]));
+      (data.workstreams || []).forEach(w => { if (byId[w.id]) w.color = byId[w.id].color; });
+    }
+    if (SEED?.meta?.linearOrg && !data.meta.linearOrg) data.meta.linearOrg = SEED.meta.linearOrg;
+  }
+
+  data.meta.seedVersion = Math.max(v, SEED?.meta?.seedVersion ?? v, 4);
 }
 
 // ─── Initial scroll to the current week (once) ────────────────────────────────
