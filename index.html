@@ -11,17 +11,14 @@
     <header id="header">
       <div class="header-left">
         <div class="logo">Flex DS</div>
-        <div class="title-block">
-          <h1 id="chart-title">Dark Matter Roadmap</h1>
-          <div id="header-stats"></div>
-        </div>
       </div>
       <div class="header-right">
-        <div id="projected-badge" class="projected-badge"></div>
         <div class="toolbar">
+          <button id="btn-manage" title="Manage people, workstreams, statuses, phases & key dates">⚙ Manage</button>
           <button id="btn-share" title="Share link">Share</button>
           <button id="btn-export" title="Export JSON">Export</button>
           <label id="btn-import-label" title="Import JSON">Import<input type="file" id="btn-import" accept=".json" /></label>
+          <button id="btn-reset" title="Reset to bundled seed data">↺ Reset</button>
           <button id="btn-add" title="Add item">+ Add</button>
         </div>
       </div>
@@ -38,12 +35,7 @@
 
     <div id="legend">
       <span class="legend-label">Status:</span>
-      <span class="legend-swatch done">Done</span>
-      <span class="legend-swatch in-eng">In eng</span>
-      <span class="legend-swatch in-design">In design</span>
-      <span class="legend-swatch to-ticket">To ticket</span>
-      <span class="legend-swatch blocked">Blocked/decision</span>
-      <span class="legend-swatch not-started">Not started</span>
+      <span id="legend-swatches"></span>
     </div>
 
     <div id="timeline-wrap">
@@ -65,15 +57,8 @@
         <label>Title<input id="f-title" type="text" /></label>
         <label>Owner<select id="f-owner"></select></label>
         <label>Workstream<select id="f-workstream"></select></label>
-        <label>Phase<select id="f-phase"><option>P1</option><option>P2</option><option>P3</option></select></label>
-        <label>Status<select id="f-status">
-          <option value="done">Done</option>
-          <option value="in-eng">In eng</option>
-          <option value="in-design">In design</option>
-          <option value="to-ticket">To ticket</option>
-          <option value="blocked">Blocked / decision</option>
-          <option value="not-started">Not started</option>
-        </select></label>
+        <label>Phase<select id="f-phase"></select></label>
+        <label>Status<select id="f-status"></select></label>
         <label>Start<input id="f-start" type="date" /></label>
         <label>End<input id="f-end" type="date" /></label>
         <label>Hands off to
@@ -87,6 +72,42 @@
         <span style="flex:1"></span>
         <button id="modal-cancel">Cancel</button>
         <button id="modal-save" class="btn-primary">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Settings / Manage modal -->
+  <div id="settings-overlay" class="hidden">
+    <div id="settings-modal">
+      <h2>Manage lists</h2>
+      <div id="settings-body">
+        <section class="settings-section">
+          <h3>Key dates</h3>
+          <div class="keydates-grid">
+            <label>Code complete<input id="s-cc-date" type="date" /></label>
+            <label>Deployment<input id="s-deploy-date" type="date" /></label>
+          </div>
+        </section>
+        <section class="settings-section">
+          <h3>People <button class="add-row" data-list="people">+ Add</button></h3>
+          <div id="list-people" class="settings-list"></div>
+        </section>
+        <section class="settings-section">
+          <h3>Workstreams <button class="add-row" data-list="workstreams">+ Add</button></h3>
+          <div id="list-workstreams" class="settings-list"></div>
+        </section>
+        <section class="settings-section">
+          <h3>Statuses <button class="add-row" data-list="statuses">+ Add</button></h3>
+          <div id="list-statuses" class="settings-list"></div>
+        </section>
+        <section class="settings-section">
+          <h3>Phases <button class="add-row" data-list="phases">+ Add</button></h3>
+          <div id="list-phases" class="settings-list"></div>
+        </section>
+      </div>
+      <div class="modal-actions">
+        <span style="flex:1"></span>
+        <button id="settings-close" class="btn-primary">Done</button>
       </div>
     </div>
   </div>

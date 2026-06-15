@@ -6,9 +6,14 @@
 */
 
 // ─── Constants ───────────────────────────────────────────────────────────────
-const COL_W = 130;  // px per week column
+const COL_W = 180;  // px per week column (single source of truth; mirrored to CSS --col-w)
 const DAY_MS = 86400000;
 const WEEK_MS = 7 * DAY_MS;
+const CARD_H = 34;  // px height of a single card
+const V_GAP  = 6;   // px vertical gap between stacked cards
+const LANE_PAD = 8; // px top/bottom padding inside a swimlane
+
+let SEED = null;    // bundled data.json (for reset / version compare)
 
 // ─── State ───────────────────────────────────────────────────────────────────
 let DATA = null;       // loaded from data.json or localStorage
@@ -49,17 +54,18 @@ function weekIndex(date, weeks) {
   return weeks.findIndex(w => w.getTime() === ms);
 }
 
+// X is relative to the grid origin (the cards-layer lives inside .swimlane-grid,
+// which already starts after the 200px label column).
 function dateToX(date, weeks) {
   const ws = weekStart(date).getTime();
   const idx = weeks.findIndex(w => w.getTime() === ws);
   if (idx < 0) return -1;
   const dayOffset = (date.getTime() - ws) / DAY_MS;
-  return 200 + idx * COL_W + (dayOffset / 7) * COL_W;
+  return idx * COL_W + (dayOffset / 7) * COL_W;
 }
 
 function xToDate(x, weeks) {
-  const relX = x - 200;
-  const rawIdx = relX / COL_W;
+  const rawIdx = x / COL_W;
   const weekIdx = Math.max(0, Math.min(weeks.length - 1, Math.floor(rawIdx)));
   const dayFrac = rawIdx - weekIdx;
   const days = Math.round(dayFrac * 7);
@@ -81,11 +87,23 @@ function visibleItems() {
 
 function personById(id) { return DATA.people.find(p => p.id === id); }
 function wsById(id)     { return DATA.workstreams.find(w => w.id === id); }
+function statusById(id) { return (DATA.statuses || []).find(s => s.id === id); }
+function phaseById(id)  { return (DATA.phases || []).find(p => p.id === id); }
 
-function statusLabel(s) {
-  return { done:'Done','in-eng':'In eng','in-design':'In design','to-ticket':'To ticket',
-           'blocked':'Blocked/decision','not-started':'Not started' }[s] || s;
+function statusLabel(s) { return statusById(s)?.label || s; }
+
+// Readable text color (black/white) for a given hex background.
+function readableFg(hex) {
+  const h = hex.replace('#','');
+  const r = parseInt(h.substr(0,2),16), g = parseInt(h.substr(2,2),16), b = parseInt(h.substr(4,2),16);
+  const lum = (0.299*r + 0.587*g + 0.114*b) / 255;
+  return lum > 0.55 ? '#111111' : '#f5f5f5';
 }
+
+function slugify(s) {
+  return s.toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'') || ('id-' + Math.abs(hashStr(s)));
+}
+function hashStr(s){let h=0;for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))|0;}return h;}
 
 // ─── Persistence ─────────────────────────────────────────────────────────────
 function save() {
@@ -100,11 +118,12 @@ function loadData(json) {
 
 // ─── Render ───────────────────────────────────────────────────────────────────
 function render() {
+  // single source of truth for column width — both headers and grid inherit it
+  document.getElementById('timeline-outer').style.setProperty('--col-w', COL_W + 'px');
   const weeks = buildWeeks();
   renderWeekHeaders(weeks);
   renderFilters();
-  renderStats();
-  renderProjectedBadge();
+  renderLegend();
   renderSwimlanes(weeks);
   // arrows need a tick for layout to settle
   requestAnimationFrame(() => renderArrows(weeks));
@@ -118,12 +137,10 @@ function renderWeekHeaders(weeks) {
 
   const container = document.getElementById('week-headers');
   container.innerHTML = '';
-  container.style.setProperty('--col-w', COL_W + 'px');
 
   weeks.forEach(w => {
     const div = document.createElement('div');
     div.className = 'week-col';
-    div.style.setProperty('--col-w', COL_W + 'px');
     const fri = addDays(w, 4);
     const isCC  = w.getTime() === ccWeek;
     const isDep = w.getTime() === depWeek;
@@ -139,17 +156,25 @@ function renderWeekHeaders(weeks) {
 }
 
 function renderFilters() {
-  const allPhases    = [...new Set(DATA.items.map(i => i.phase))].sort();
-  const allStatuses  = ['done','in-eng','in-design','to-ticket','blocked','not-started'];
+  const allPhases    = DATA.phases.map(p => p.id);
+  const allStatuses  = DATA.statuses.map(s => s.id);
   const allWS        = DATA.workstreams.map(w => w.id);
 
-  function makeGroup(containerId, values, filterSet, labelFn) {
+  function makeGroup(containerId, values, filterSet, labelFn, colorFn) {
     const c = document.getElementById(containerId);
     c.innerHTML = '';
     values.forEach(v => {
       const btn = document.createElement('button');
       btn.className = 'filter-btn' + (filterSet.has(v) ? ' active' : '');
       btn.textContent = labelFn(v);
+      const accent = colorFn && colorFn(v);
+      if (accent) {
+        btn.style.setProperty('--chip', accent);
+        const dot = document.createElement('span');
+        dot.className = 'chip-dot';
+        dot.style.background = accent;
+        btn.prepend(dot);
+      }
       btn.onclick = () => {
         if (filterSet.has(v)) filterSet.delete(v); else filterSet.add(v);
         render();
@@ -157,35 +182,22 @@ function renderFilters() {
       c.appendChild(btn);
     });
   }
-  makeGroup('filter-phase',      allPhases,   filters.phase,      v => v);
-  makeGroup('filter-status',     allStatuses, filters.status,     statusLabel);
-  makeGroup('filter-workstream', allWS,       filters.workstream, v => wsById(v)?.label || v);
+  makeGroup('filter-phase',      allPhases,   filters.phase,      v => phaseById(v)?.label || v);
+  makeGroup('filter-status',     allStatuses, filters.status,     statusLabel,                 v => statusById(v)?.bg);
+  makeGroup('filter-workstream', allWS,       filters.workstream, v => wsById(v)?.label || v,  v => wsById(v)?.color);
 }
 
-function renderStats() {
-  const items = DATA.items;
-  const done = items.filter(i => i.status === 'done').length;
-  document.getElementById('header-stats').textContent =
-    `${done}/${items.length} done · Code complete ${DATA.meta.codeCompleteDate} · Deploy ${DATA.meta.deployDate}`;
-}
-
-function renderProjectedBadge() {
-  const target = parseDate(DATA.meta.codeCompleteDate);
-  const p1Items = DATA.items.filter(i => i.phase === 'P1');
-  if (!p1Items.length) return;
-  const latest = new Date(Math.max(...p1Items.map(i => parseDate(i.end).getTime())));
-  const badge = document.getElementById('projected-badge');
-  const diffDays = Math.round((latest.getTime() - target.getTime()) / DAY_MS);
-  if (diffDays <= 0) {
-    badge.className = 'projected-badge on-track';
-    badge.textContent = diffDays === 0 ? 'On track — Jul 24' : `${Math.abs(diffDays)}d early`;
-  } else if (diffDays <= 7) {
-    badge.className = 'projected-badge at-risk';
-    badge.textContent = `At risk — +${diffDays}d`;
-  } else {
-    badge.className = 'projected-badge off-track';
-    badge.textContent = `Off track — +${diffDays}d`;
-  }
+function renderLegend() {
+  const c = document.getElementById('legend-swatches');
+  c.innerHTML = '';
+  DATA.statuses.forEach(s => {
+    const span = document.createElement('span');
+    span.className = 'legend-swatch';
+    span.textContent = s.label;
+    span.style.background = s.bg;
+    span.style.color = s.fg || readableFg(s.bg);
+    c.appendChild(span);
+  });
 }
 
 function renderSwimlanes(weeks) {
@@ -222,12 +234,17 @@ function renderSwimlanes(weeks) {
       grid.appendChild(col);
     });
 
+    // Lane packing: assign each item to the first track with no date overlap.
+    const tracks = packTracks(personItems);
+    const laneHeight = LANE_PAD * 2 + tracks.count * CARD_H + (tracks.count - 1) * V_GAP;
+    lane.style.minHeight = laneHeight + 'px';
+
     // Cards layer
     const cardsLayer = document.createElement('div');
     cardsLayer.className = 'cards-layer';
 
     personItems.forEach(item => {
-      const card = buildCard(item, weeks, grid);
+      const card = buildCard(item, weeks, tracks.byId[item.id]);
       if (card) cardsLayer.appendChild(card);
     });
     grid.appendChild(cardsLayer);
@@ -236,7 +253,26 @@ function renderSwimlanes(weeks) {
   });
 }
 
-function buildCard(item, weeks, grid) {
+// Greedy interval partitioning. Returns {count, byId:{itemId->trackIndex}}.
+function packTracks(items) {
+  const sorted = [...items].sort((a, b) => parseDate(a.start) - parseDate(b.start));
+  const trackEnds = [];   // last end-date (ms) per track
+  const byId = {};
+  sorted.forEach(item => {
+    const s = parseDate(item.start).getTime();
+    const e = parseDate(item.end).getTime();
+    let placed = -1;
+    for (let t = 0; t < trackEnds.length; t++) {
+      if (trackEnds[t] < s) { placed = t; break; }  // no overlap (strictly before)
+    }
+    if (placed === -1) { placed = trackEnds.length; trackEnds.push(e); }
+    else trackEnds[placed] = e;
+    byId[item.id] = placed;
+  });
+  return { count: Math.max(1, trackEnds.length), byId };
+}
+
+function buildCard(item, weeks, track) {
   const startDate = parseDate(item.start);
   const endDate   = parseDate(item.end);
   const x1 = dateToX(startDate, weeks);
@@ -245,12 +281,18 @@ function buildCard(item, weeks, grid) {
   if (x1 < 0 || w < 1) return null;
 
   const ws = wsById(item.workstream);
+  const st = statusById(item.status);
   const card = document.createElement('div');
-  card.className = `card ${item.status}`;
+  card.className = 'card';
   card.dataset.id = item.id;
-  card.style.left  = x1 + 'px';
-  card.style.width = w + 'px';
-  if (ws) card.style.borderTopColor = ws.color;
+  card.style.left   = x1 + 'px';
+  card.style.width  = w + 'px';
+  card.style.top    = (LANE_PAD + (track || 0) * (CARD_H + V_GAP)) + 'px';
+  card.style.height = CARD_H + 'px';
+  // colors are data-driven (statuses are editable)
+  if (st) { card.style.background = st.bg; card.style.color = st.fg || readableFg(st.bg); }
+  card.style.borderColor = 'rgba(255,255,255,0.1)';
+  if (ws) { card.style.borderLeft = `3px solid ${ws.color}`; }
 
   const linear = item.linear ? ` · ${item.linear}` : '';
   card.innerHTML = `
@@ -444,9 +486,16 @@ function openModal(itemId) {
     `<option value="${p.id}" ${!isNew && item.handsOffTo?.includes(p.id) ? 'selected' : ''}>${p.name}</option>`
   ).join('');
 
+  // phase select (data-driven)
+  document.getElementById('f-phase').innerHTML = DATA.phases.map(p =>
+    `<option value="${p.id}">${p.label}</option>`).join('');
+  // status select (data-driven)
+  document.getElementById('f-status').innerHTML = DATA.statuses.map(s =>
+    `<option value="${s.id}">${s.label}</option>`).join('');
+
   document.getElementById('f-title').value   = item?.title   || '';
-  document.getElementById('f-phase').value   = item?.phase   || 'P1';
-  document.getElementById('f-status').value  = item?.status  || 'to-ticket';
+  document.getElementById('f-phase').value   = item?.phase   || DATA.phases[0]?.id   || 'P1';
+  document.getElementById('f-status').value  = item?.status  || DATA.statuses[0]?.id || 'to-ticket';
   document.getElementById('f-start').value   = item?.start   || DATA.meta.startDate;
   document.getElementById('f-end').value     = item?.end     || DATA.meta.startDate;
   document.getElementById('f-linear').value  = item?.linear  || '';
@@ -542,6 +591,138 @@ document.getElementById('btn-import').onchange = e => {
   reader.readAsText(file);
 };
 
+// ─── Reset to seed ────────────────────────────────────────────────────────────
+document.getElementById('btn-reset').onclick = () => {
+  if (!SEED) { alert('Seed data not loaded.'); return; }
+  if (!confirm('Reset to the bundled roadmap? This discards your local changes.')) return;
+  loadData(JSON.parse(JSON.stringify(SEED)));
+  save();
+};
+
+// ─── Settings / Manage panel ──────────────────────────────────────────────────
+const settingsOverlay = document.getElementById('settings-overlay');
+
+document.getElementById('btn-manage').onclick = openSettings;
+document.getElementById('settings-close').onclick = closeSettings;
+settingsOverlay.onclick = e => { if (e.target === settingsOverlay) closeSettings(); };
+
+function openSettings() {
+  document.getElementById('s-cc-date').value     = DATA.meta.codeCompleteDate || '';
+  document.getElementById('s-deploy-date').value = DATA.meta.deployDate || '';
+  renderSettingsLists();
+  settingsOverlay.classList.remove('hidden');
+}
+function closeSettings() { settingsOverlay.classList.add('hidden'); }
+
+// key-date inputs commit immediately
+document.getElementById('s-cc-date').onchange = e => {
+  if (e.target.value) { DATA.meta.codeCompleteDate = e.target.value; save(); render(); }
+};
+document.getElementById('s-deploy-date').onchange = e => {
+  if (e.target.value) { DATA.meta.deployDate = e.target.value; save(); render(); }
+};
+
+// count of items referencing a given list entry (for delete-safety)
+function usageCount(listKey, id) {
+  switch (listKey) {
+    case 'people':      return DATA.items.filter(i => i.owner === id || (i.handsOffTo||[]).includes(id)).length;
+    case 'workstreams': return DATA.items.filter(i => i.workstream === id).length;
+    case 'statuses':    return DATA.items.filter(i => i.status === id).length;
+    case 'phases':      return DATA.items.filter(i => i.phase === id).length;
+  }
+  return 0;
+}
+
+function renderSettingsLists() {
+  renderSettingsList('people',      'list-people');
+  renderSettingsList('workstreams', 'list-workstreams');
+  renderSettingsList('statuses',    'list-statuses');
+  renderSettingsList('phases',      'list-phases');
+}
+
+function renderSettingsList(listKey, containerId) {
+  const c = document.getElementById(containerId);
+  c.innerHTML = '';
+  DATA[listKey].forEach((entry, idx) => {
+    const row = document.createElement('div');
+    row.className = 'settings-row';
+
+    // color (people/workstreams use .color; statuses use .bg; phases have none)
+    const hasColor = listKey === 'people' || listKey === 'workstreams' || listKey === 'statuses';
+    if (hasColor) {
+      const colorKey = listKey === 'statuses' ? 'bg' : 'color';
+      const swatch = document.createElement('input');
+      swatch.type = 'color';
+      swatch.value = entry[colorKey] || '#888888';
+      swatch.title = 'Color';
+      swatch.oninput = () => { entry[colorKey] = swatch.value; save(); render(); };
+      row.appendChild(swatch);
+    } else {
+      const spacer = document.createElement('span');
+      spacer.className = 'swatch-spacer';
+      row.appendChild(spacer);
+    }
+
+    // primary label (name for people, label for others)
+    const labelKey = listKey === 'people' ? 'name' : 'label';
+    const label = document.createElement('input');
+    label.type = 'text';
+    label.value = entry[labelKey] || '';
+    label.placeholder = listKey === 'people' ? 'Name' : 'Label';
+    label.oninput = () => { entry[labelKey] = label.value; save(); render(); };
+    row.appendChild(label);
+
+    // role for people
+    if (listKey === 'people') {
+      const role = document.createElement('input');
+      role.type = 'text';
+      role.value = entry.role || '';
+      role.placeholder = 'Role';
+      role.oninput = () => { entry.role = role.value; save(); render(); };
+      row.appendChild(role);
+    }
+
+    // delete
+    const del = document.createElement('button');
+    del.className = 'row-delete';
+    const used = usageCount(listKey, entry.id);
+    if (used > 0) {
+      del.textContent = `in use (${used})`;
+      del.disabled = true;
+      del.title = 'Reassign these items before deleting';
+    } else {
+      del.textContent = '✕';
+      del.title = 'Delete';
+      del.onclick = () => {
+        DATA[listKey].splice(idx, 1);
+        save();
+        renderSettingsLists();
+        render();
+      };
+    }
+    row.appendChild(del);
+    c.appendChild(row);
+  });
+}
+
+// + Add buttons
+document.querySelectorAll('.add-row').forEach(btn => {
+  btn.onclick = () => {
+    const listKey = btn.dataset.list;
+    const baseLabel = { people:'New person', workstreams:'New workstream',
+                        statuses:'New status', phases:'New phase' }[listKey];
+    let id = slugify(baseLabel);
+    while (DATA[listKey].some(e => e.id === id)) id += '-' + (DATA[listKey].length + 1);
+    if (listKey === 'people')      DATA[listKey].push({ id, name: baseLabel, role: '', color: '#7C6FCD' });
+    else if (listKey === 'workstreams') DATA[listKey].push({ id, label: baseLabel, color: '#6366F1' });
+    else if (listKey === 'statuses')    DATA[listKey].push({ id, label: baseLabel, bg: '#334155', fg: '#e2e8f0' });
+    else if (listKey === 'phases')      DATA[listKey].push({ id, label: baseLabel });
+    save();
+    renderSettingsLists();
+    render();
+  };
+});
+
 // ─── Share ────────────────────────────────────────────────────────────────────
 document.getElementById('btn-share').onclick = () => {
   const url = window.location.href.split('?')[0];
@@ -560,13 +741,36 @@ document.getElementById('btn-share').onclick = () => {
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 async function boot() {
+  // always fetch bundled seed so we can compare versions / offer reset
+  try {
+    const resp = await fetch('./data.json', { cache: 'no-store' });
+    SEED = await resp.json();
+  } catch { SEED = null; }
+
   const saved = localStorage.getItem('flex-ds-roadmap');
   if (saved) {
-    try { DATA = JSON.parse(saved); render(); return; } catch {}
+    let parsed = null;
+    try { parsed = JSON.parse(saved); } catch {}
+    if (parsed) {
+      const savedV  = parsed.meta?.seedVersion ?? 0;
+      const seedV   = SEED?.meta?.seedVersion ?? 0;
+      if (SEED && seedV !== savedV) {
+        const ok = confirm(
+          'An updated roadmap is available (v' + seedV + ').\n\n' +
+          'Load it? This replaces your local changes.\n' +
+          'Cancel to keep your current version.'
+        );
+        if (ok) { loadData(JSON.parse(JSON.stringify(SEED))); save(); return; }
+        // keep local, but stop nagging on every load
+        parsed.meta = parsed.meta || {};
+        parsed.meta.seedVersion = seedV;
+        DATA = parsed; save(); render(); return;
+      }
+      DATA = parsed; render(); return;
+    }
   }
-  // load from bundled data.json
-  const resp = await fetch('./data.json');
-  DATA = await resp.json();
+  // no saved state → use seed
+  DATA = SEED;
   render();
 }
 

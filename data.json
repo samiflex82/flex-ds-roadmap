@@ -1,16 +1,30 @@
 {
   "meta": {
     "title": "Flex DS — Dark Matter Roadmap",
+    "seedVersion": 2,
     "codeCompleteDate": "2026-07-24",
     "deployDate": "2026-07-29",
     "startDate": "2026-06-15"
   },
   "people": [
-    { "id": "sami",   "name": "Sami W",   "role": "Main DS Designer + ops/pgm", "color": "#7C6FCD" },
-    { "id": "amanda", "name": "Amanda C", "role": "Main DS Eng",                "color": "#2DA05A" },
-    { "id": "emily",  "name": "Emily C",  "role": "Production Designer",         "color": "#E07B39" },
-    { "id": "alexa",  "name": "Alexa D",  "role": "DS Design Manager",           "color": "#C14D74" },
-    { "id": "isaac",  "name": "Isaac W",  "role": "DS Eng Manager",              "color": "#3B82C4" }
+    { "id": "sami",   "name": "Sami W",   "role": "DS Designer + Ops",  "color": "#7C6FCD" },
+    { "id": "amanda", "name": "Amanda C", "role": "Lead DS Eng",        "color": "#2DA05A" },
+    { "id": "emily",  "name": "Emily C",  "role": "Production Designer", "color": "#E07B39" },
+    { "id": "alexa",  "name": "Alexa D",  "role": "DS Design Manager",   "color": "#C14D74" },
+    { "id": "isaac",  "name": "Isaac W",  "role": "DS Eng Manager",      "color": "#3B82C4" }
+  ],
+  "statuses": [
+    { "id": "done",        "label": "Done",              "bg": "#134e2a", "fg": "#86efac" },
+    { "id": "in-eng",      "label": "In eng",            "bg": "#1e3a5f", "fg": "#93c5fd" },
+    { "id": "in-design",   "label": "In design",         "bg": "#2d1b5e", "fg": "#c4b5fd" },
+    { "id": "to-ticket",   "label": "To ticket",         "bg": "#1c1c3a", "fg": "#a5b4fc" },
+    { "id": "blocked",     "label": "Blocked/decision",  "bg": "#431407", "fg": "#fdba74" },
+    { "id": "not-started", "label": "Not started",       "bg": "#1a1928", "fg": "#6b7280" }
+  ],
+  "phases": [
+    { "id": "P1", "label": "P1" },
+    { "id": "P2", "label": "P2" },
+    { "id": "P3", "label": "P3" }
   ],
   "workstreams": [
     { "id": "color",     "label": "Color Token Remap", "color": "#6366F1" },
