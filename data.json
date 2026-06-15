@@ -1,12 +1,13 @@
 {
   "meta": {
     "title": "Flex DS — Dark Matter Roadmap",
-    "seedVersion": 4,
+    "seedVersion": 5,
     "codeCompleteDate": "2026-07-24",
     "deployDate": "2026-07-29",
     "startDate": "2026-06-15",
     "timelineStart": "2026-06-01",
-    "linearOrg": "get-flex"
+    "linearOrg": "get-flex",
+    "timelineEnd": "2026-12-31"
   },
   "people": [
     {
@@ -68,14 +69,14 @@
     {
       "id": "to-ticket",
       "label": "To ticket",
-      "bg": "#241A3A",
-      "fg": "#C4B5FD"
+      "bg": "#0F3030",
+      "fg": "#6FD8CE"
     },
     {
       "id": "in-design",
       "label": "In design",
-      "bg": "#2A1D4D",
-      "fg": "#CBB6FF"
+      "bg": "#331526",
+      "fg": "#F2A6C9"
     },
     {
       "id": "in-development",

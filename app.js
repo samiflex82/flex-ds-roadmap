@@ -40,6 +40,7 @@ function buildWeeks() {
   const allDates = DATA.items.flatMap(i => [parseDate(i.start), parseDate(i.end)]);
   allDates.push(parseDate(DATA.meta.codeCompleteDate), parseDate(DATA.meta.deployDate));
   if (DATA.meta.timelineStart) allDates.push(parseDate(DATA.meta.timelineStart));
+  if (DATA.meta.timelineEnd)   allDates.push(parseDate(DATA.meta.timelineEnd));
   const earliest = weekStart(new Date(Math.min(...allDates)));
   const latest   = weekStart(new Date(Math.max(...allDates)));
   const weeks = [];
@@ -151,8 +152,6 @@ function render() {
   renderFilters();
   renderLegend();
   renderSwimlanes(weeks);
-  // arrows need a tick for layout to settle
-  requestAnimationFrame(() => renderArrows(weeks));
 }
 
 function renderWeekHeaders(weeks) {
@@ -358,7 +357,6 @@ function buildCard(item, weeks, track) {
   card.innerHTML = `
     <div class="card-title">${wsIcon}${escapeHtml(item.title)}</div>
     <div class="card-meta">${escapeHtml(statusLabel(item.status))}${linearHtml}</div>
-    <div class="link-handle" title="Drag to another card to set a dependency"></div>
     <div class="resize-handle"></div>
   `;
   // Linear link opens without triggering the card's edit-panel click
@@ -370,13 +368,11 @@ function buildCard(item, weeks, track) {
     card.addEventListener('click', e => {
       if (card.classList.contains('dragging')) return;
       if (e.target.classList.contains('resize-handle')) return;
-      if (e.target.classList.contains('link-handle')) return;
       if (e.target.classList.contains('card-link')) return;
       openPanel(item.id);
     });
     setupDrag(card, item, weeks);
     setupResize(card.querySelector('.resize-handle'), item, weeks);
-    setupConnect(card.querySelector('.link-handle'), item, weeks);
   } else {
     card.style.cursor = 'default';
   }
@@ -389,7 +385,6 @@ function setupDrag(card, item, weeks) {
 
   card.addEventListener('mousedown', e => {
     if (e.target.classList.contains('resize-handle')) return;
-    if (e.target.classList.contains('link-handle')) return;
     e.preventDefault();
     startX = e.clientX;
     startY = e.clientY;
@@ -405,7 +400,6 @@ function setupDrag(card, item, weeks) {
       card.classList.add('dragging');
       card.style.left = (origLeft + dx) + 'px';
       card.style.top  = (origTop + dy) + 'px';   // follow cursor vertically too
-      scheduleArrowRedraw(weeks);                // arrows track the card live
     }
 
     function onUp(e) {
@@ -439,60 +433,6 @@ function setupDrag(card, item, weeks) {
   });
 }
 
-// ─── Connect: drag the link-handle onto another card to create a connection ────
-function setupConnect(handle, item, weeks) {
-  if (!handle) return;
-  handle.addEventListener('mousedown', e => {
-    e.preventDefault();
-    e.stopPropagation();
-    const outer = document.getElementById('timeline-outer');
-    const wrap = document.getElementById('timeline-wrap');
-    const startCard = handle.closest('.card');
-
-    // temp line in the arrows svg layer
-    let svg = document.getElementById('arrows-svg');
-    const tmp = document.createElementNS('http://www.w3.org/2000/svg','path');
-    tmp.setAttribute('stroke', '#6A3DB8');
-    tmp.setAttribute('stroke-width', '2');
-    tmp.setAttribute('fill', 'none');
-    if (svg) svg.appendChild(tmp);
-
-    function ptInOuter(clientX, clientY) {
-      const r = outer.getBoundingClientRect();
-      return { x: clientX - r.left + wrap.scrollLeft, y: clientY - r.top + wrap.scrollTop };
-    }
-    const sRect = startCard.getBoundingClientRect();
-    const start = ptInOuter(sRect.right, sRect.top + sRect.height / 2);
-
-    function onMove(e) {
-      const p = ptInOuter(e.clientX, e.clientY);
-      tmp.setAttribute('d', `M${start.x},${start.y} L${p.x},${p.y}`);
-    }
-    function onUp(e) {
-      document.removeEventListener('mousemove', onMove);
-      document.removeEventListener('mouseup', onUp);
-      if (tmp.parentNode) tmp.remove();
-      handle.style.pointerEvents = 'none';
-      const under = document.elementFromPoint(e.clientX, e.clientY);
-      handle.style.pointerEvents = '';
-      const targetCard = under && under.closest('.card');
-      if (targetCard) {
-        const targetId = Number(targetCard.dataset.id);
-        if (targetId !== item.id) {
-          item.blocking = item.blocking || [];
-          const i = item.blocking.indexOf(targetId);
-          if (i >= 0) item.blocking.splice(i, 1);   // toggle off if already linked
-          else item.blocking.push(targetId);        // this item blocks the target
-          save();
-          render();
-        }
-      }
-    }
-    document.addEventListener('mousemove', onMove);
-    document.addEventListener('mouseup', onUp);
-  });
-}
-
 function setupResize(handle, item, weeks) {
   handle.addEventListener('mousedown', e => {
     e.preventDefault();
@@ -505,7 +445,6 @@ function setupResize(handle, item, weeks) {
       const dx = e.clientX - startX;
       const newW = Math.max(20, origWidth + dx);
       card.style.width = newW + 'px';
-      scheduleArrowRedraw(weeks);
     }
 
     function onUp(e) {
@@ -528,147 +467,7 @@ function setupResize(handle, item, weeks) {
   });
 }
 
-// ─── Dependency arrows ────────────────────────────────────────────────────────
-let _arrowRAF = null;
-function scheduleArrowRedraw(weeks) {
-  if (_arrowRAF) return;
-  _arrowRAF = requestAnimationFrame(() => { _arrowRAF = null; renderArrows(weeks); });
-}
-
-function renderArrows(weeks) {
-  const old = document.getElementById('arrows-svg');
-  if (old) old.remove();
-
-  const outer = document.getElementById('timeline-outer');
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.id = 'arrows-svg';
-  svg.setAttribute('width',  outer.scrollWidth);
-  svg.setAttribute('height', outer.scrollHeight);
-  outer.appendChild(svg);
-
-  const defs = document.createElementNS('http://www.w3.org/2000/svg','defs');
-  const marker = document.createElementNS('http://www.w3.org/2000/svg','marker');
-  marker.setAttribute('id','arrow');
-  marker.setAttribute('markerWidth','6');
-  marker.setAttribute('markerHeight','6');
-  marker.setAttribute('refX','5');
-  marker.setAttribute('refY','3');
-  marker.setAttribute('orient','auto');
-  const path = document.createElementNS('http://www.w3.org/2000/svg','path');
-  path.setAttribute('d','M0,0 L0,6 L6,3 z');
-  path.setAttribute('fill','rgba(255,255,255,0.25)');
-  marker.appendChild(path);
-  defs.appendChild(marker);
-  svg.appendChild(defs);
-
-  const items = visibleItems();
-  const visibleIds = new Set(items.map(i => i.id));
-  const outerRect = outer.getBoundingClientRect();
-  const scrollLeft = document.getElementById('timeline-wrap').scrollLeft;
-  const scrollTop  = document.getElementById('timeline-wrap').scrollTop;
-
-  items.forEach(item => {
-    if (!item.blocking?.length) return;
-    const fromCard = document.querySelector(`.card[data-id="${item.id}"]`);
-    if (!fromCard) return;
-
-    item.blocking.forEach(toId => {
-      if (!visibleIds.has(toId)) return;            // target filtered out — skip
-      const toCard = document.querySelector(`.card[data-id="${toId}"]`);
-      if (!toCard) return;
-
-      const fromRect = fromCard.getBoundingClientRect();
-      const toRect   = toCard.getBoundingClientRect();
-
-      const x1 = fromRect.right  - outerRect.left + scrollLeft;
-      const y1 = fromRect.top    - outerRect.top  + scrollTop + fromRect.height / 2;
-      const x2 = toRect.left     - outerRect.left + scrollLeft;
-      const y2 = toRect.top      - outerRect.top  + scrollTop + toRect.height / 2;
-
-      const cx1 = x1 + 30;
-      const cx2 = x2 - 30;
-      const d = `M${x1},${y1} C${cx1},${y1} ${cx2},${y2} ${x2},${y2}`;
-
-      // visible line
-      const line = document.createElementNS('http://www.w3.org/2000/svg','path');
-      line.setAttribute('d', d);
-      line.setAttribute('stroke', 'rgba(124,79,208,0.6)');
-      line.setAttribute('stroke-width', '1.5');
-      line.setAttribute('fill', 'none');
-      line.setAttribute('stroke-dasharray', '4 3');
-      line.setAttribute('marker-end', 'url(#arrow)');
-      svg.appendChild(line);
-
-      // fat invisible hit-target to click-remove the link
-      const hit = document.createElementNS('http://www.w3.org/2000/svg','path');
-      hit.setAttribute('d', d);
-      hit.setAttribute('stroke', 'transparent');
-      hit.setAttribute('stroke-width', '12');
-      hit.setAttribute('fill', 'none');
-      hit.style.cursor = 'pointer';
-      hit.style.pointerEvents = 'stroke';
-      hit.addEventListener('click', () => {
-        if (READONLY) return;
-        if (!confirm('Remove this dependency?')) return;
-        item.blocking = item.blocking.filter(id => id !== toId);
-        save();
-        render();
-      });
-      svg.appendChild(hit);
-    });
-  });
-}
-
 // ─── Edit side panel ──────────────────────────────────────────────────────────
-function depLabel(it) { return `${it.title} — ${personById(it.owner)?.name || ''}`; }
-
-// Live-edited dependency chips (Blocking + Blocked by)
-function renderDeps(item) {
-  const itemById = id => DATA.items.find(x => x.id === id);
-  item.blocking = item.blocking || [];
-
-  const blockingBox  = document.getElementById('f-blocking');
-  const blockedbyBox = document.getElementById('f-blockedby');
-  const blockingAdd  = document.getElementById('f-blocking-add');
-  const blockedbyAdd = document.getElementById('f-blockedby-add');
-
-  const chip = (it, id) =>
-    `<span class="dep-chip"><span>${escapeHtml(depLabel(it))}</span><span class="chip-x" data-id="${id}">×</span></span>`;
-
-  // Blocking: items THIS one blocks
-  const blk = item.blocking.map(itemById).filter(Boolean);
-  blockingBox.innerHTML = blk.length ? blk.map(t => chip(t, t.id)).join('') : '<span class="dep-empty">None</span>';
-  blockingBox.querySelectorAll('.chip-x').forEach(x => x.onclick = () => {
-    item.blocking = item.blocking.filter(id => id !== Number(x.dataset.id));
-    save(); renderDeps(item); render();
-  });
-
-  // Blocked by: items whose blocking includes this id (derived)
-  const blockers = DATA.items.filter(o => (o.blocking || []).includes(item.id));
-  blockedbyBox.innerHTML = blockers.length ? blockers.map(o => chip(o, o.id)).join('') : '<span class="dep-empty">None</span>';
-  blockedbyBox.querySelectorAll('.chip-x').forEach(x => x.onclick = () => {
-    const src = itemById(Number(x.dataset.id));
-    if (src) src.blocking = (src.blocking || []).filter(id => id !== item.id);
-    save(); renderDeps(item); render();
-  });
-
-  // Add pickers
-  const opt = it => `<option value="${it.id}">${escapeHtml(depLabel(it))}</option>`;
-  blockingAdd.innerHTML = '<option value="">＋ Add item this blocks…</option>' +
-    DATA.items.filter(it => it.id !== item.id && !item.blocking.includes(it.id)).map(opt).join('');
-  blockingAdd.onchange = () => {
-    const id = Number(blockingAdd.value); if (!id) return;
-    item.blocking.push(id); save(); renderDeps(item); render();
-  };
-  blockedbyAdd.innerHTML = '<option value="">＋ Add item that blocks this…</option>' +
-    DATA.items.filter(it => it.id !== item.id && !(it.blocking || []).includes(item.id)).map(opt).join('');
-  blockedbyAdd.onchange = () => {
-    const id = Number(blockedbyAdd.value); if (!id) return;
-    const src = itemById(id); if (src) { src.blocking = src.blocking || []; src.blocking.push(item.id); }
-    save(); renderDeps(item); render();
-  };
-}
-
 function openPanel(itemId) {
   editingId = itemId;
   const item = DATA.items.find(i => i.id === itemId);
@@ -692,11 +491,6 @@ function openPanel(itemId) {
   document.getElementById('f-end').value      = item?.end     || DATA.meta.startDate;
   document.getElementById('f-linear').value   = item?.linear  || '';
   document.getElementById('f-notes').value    = item?.notes   || '';
-
-  // Dependencies: only for saved items (need an id to relate to)
-  const depBlocks = document.querySelectorAll('#panel .dep-block');
-  depBlocks.forEach(b => b.style.display = isNew ? 'none' : '');
-  if (!isNew) renderDeps(item);
 
   document.getElementById('panel-delete').style.display = isNew ? 'none' : '';
   document.getElementById('panel-overlay').classList.add('open');
@@ -1076,8 +870,9 @@ function migrate(data) {
   });
   if (v < 3 && !data.items.some(it => it.blocking.length)) seedLinksFromHandoff(data.items);
 
-  // v<4: Flex black-theme refresh — re-apply seed status colors + workstream colors (preserve custom entries/labels)
-  if (v < 4) {
+  // v<5: Flex theme refresh — re-apply seed status colors + workstream colors (preserve custom entries/labels).
+  // Covers the v4 black theme and the v5 de-purple (to-ticket→teal, in-design→pink).
+  if (v < 5) {
     if (SEED?.statuses) {
       const byId = Object.fromEntries(SEED.statuses.map(s => [s.id, s]));
       (data.statuses || []).forEach(s => { if (byId[s.id]) { s.bg = byId[s.id].bg; s.fg = byId[s.id].fg; } });
@@ -1087,9 +882,10 @@ function migrate(data) {
       (data.workstreams || []).forEach(w => { if (byId[w.id]) w.color = byId[w.id].color; });
     }
     if (SEED?.meta?.linearOrg && !data.meta.linearOrg) data.meta.linearOrg = SEED.meta.linearOrg;
+    if (SEED?.meta?.timelineEnd && !data.meta.timelineEnd) data.meta.timelineEnd = SEED.meta.timelineEnd;
   }
 
-  data.meta.seedVersion = Math.max(v, SEED?.meta?.seedVersion ?? v, 4);
+  data.meta.seedVersion = Math.max(v, SEED?.meta?.seedVersion ?? v, 5);
 }
 
 // ─── Initial scroll to the current week (once) ────────────────────────────────
