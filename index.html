@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Flex DS — Dark Matter Roadmap</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="app">
+    <header id="header">
+      <div class="header-left">
+        <div class="logo">Flex DS</div>
+        <div class="title-block">
+          <h1 id="chart-title">Dark Matter Roadmap</h1>
+          <div id="header-stats"></div>
+        </div>
+      </div>
+      <div class="header-right">
+        <div id="projected-badge" class="projected-badge"></div>
+        <div class="toolbar">
+          <button id="btn-share" title="Share link">Share</button>
+          <button id="btn-export" title="Export JSON">Export</button>
+          <label id="btn-import-label" title="Import JSON">Import<input type="file" id="btn-import" accept=".json" /></label>
+          <button id="btn-add" title="Add item">+ Add</button>
+        </div>
+      </div>
+    </header>
+
+    <div id="filters">
+      <span class="filter-label">Filter:</span>
+      <div id="filter-phase" class="filter-group"></div>
+      <div class="filter-sep"></div>
+      <div id="filter-status" class="filter-group"></div>
+      <div class="filter-sep"></div>
+      <div id="filter-workstream" class="filter-group"></div>
+    </div>
+
+    <div id="legend">
+      <span class="legend-label">Status:</span>
+      <span class="legend-swatch done">Done</span>
+      <span class="legend-swatch in-eng">In eng</span>
+      <span class="legend-swatch in-design">In design</span>
+      <span class="legend-swatch to-ticket">To ticket</span>
+      <span class="legend-swatch blocked">Blocked/decision</span>
+      <span class="legend-swatch not-started">Not started</span>
+    </div>
+
+    <div id="timeline-wrap">
+      <div id="timeline-outer">
+        <div id="col-header">
+          <div class="lane-label-spacer"></div>
+          <div id="week-headers" class="week-headers"></div>
+        </div>
+        <div id="swimlanes"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit modal -->
+  <div id="modal-overlay" class="hidden">
+    <div id="modal">
+      <h2 id="modal-title">Edit item</h2>
+      <div class="form-grid">
+        <label>Title<input id="f-title" type="text" /></label>
+        <label>Owner<select id="f-owner"></select></label>
+        <label>Workstream<select id="f-workstream"></select></label>
+        <label>Phase<select id="f-phase"><option>P1</option><option>P2</option><option>P3</option></select></label>
+        <label>Status<select id="f-status">
+          <option value="done">Done</option>
+          <option value="in-eng">In eng</option>
+          <option value="in-design">In design</option>
+          <option value="to-ticket">To ticket</option>
+          <option value="blocked">Blocked / decision</option>
+          <option value="not-started">Not started</option>
+        </select></label>
+        <label>Start<input id="f-start" type="date" /></label>
+        <label>End<input id="f-end" type="date" /></label>
+        <label>Hands off to
+          <select id="f-handoff" multiple></select>
+        </label>
+        <label>Linear ticket<input id="f-linear" type="text" placeholder="DS-179" /></label>
+        <label class="full">Notes<textarea id="f-notes" rows="2"></textarea></label>
+      </div>
+      <div class="modal-actions">
+        <button id="modal-delete" class="btn-danger">Delete</button>
+        <span style="flex:1"></span>
+        <button id="modal-cancel">Cancel</button>
+        <button id="modal-save" class="btn-primary">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

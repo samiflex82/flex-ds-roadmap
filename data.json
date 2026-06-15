@@ -1,0 +1,66 @@
+{
+  "meta": {
+    "title": "Flex DS — Dark Matter Roadmap",
+    "codeCompleteDate": "2026-07-24",
+    "deployDate": "2026-07-29",
+    "startDate": "2026-06-15"
+  },
+  "people": [
+    { "id": "sami",   "name": "Sami W",   "role": "Main DS Designer + ops/pgm", "color": "#7C6FCD" },
+    { "id": "amanda", "name": "Amanda C", "role": "Main DS Eng",                "color": "#2DA05A" },
+    { "id": "emily",  "name": "Emily C",  "role": "Production Designer",         "color": "#E07B39" },
+    { "id": "alexa",  "name": "Alexa D",  "role": "DS Design Manager",           "color": "#C14D74" },
+    { "id": "isaac",  "name": "Isaac W",  "role": "DS Eng Manager",              "color": "#3B82C4" }
+  ],
+  "workstreams": [
+    { "id": "color",     "label": "Color Token Remap", "color": "#6366F1" },
+    { "id": "icons",     "label": "Icons",             "color": "#F59E0B" },
+    { "id": "component", "label": "Components",        "color": "#10B981" },
+    { "id": "brand",     "label": "Brand",             "color": "#EC4899" },
+    { "id": "type",      "label": "Type",              "color": "#8B5CF6" },
+    { "id": "spacing",   "label": "Spacing",           "color": "#06B6D4" },
+    { "id": "shape",     "label": "Shape / Radii",     "color": "#84CC16" },
+    { "id": "templates", "label": "Templates",         "color": "#F97316" },
+    { "id": "onebill",   "label": "OneBill",           "color": "#A78BFA" }
+  ],
+  "items": [
+    { "id":  1, "phase":"P1", "workstream":"color",     "title":"Component color cleanup — spec ticket",              "owner":"sami",   "handsOffTo":["amanda"], "status":"to-ticket",  "start":"2026-06-15", "end":"2026-06-26", "linear":"",       "notes":"" },
+    { "id":  2, "phase":"P1", "workstream":"color",     "title":"VQA + remap outliers",                               "owner":"sami",   "handsOffTo":["amanda"], "status":"in-design",  "start":"2026-06-29", "end":"2026-07-17", "linear":"",       "notes":"" },
+    { "id":  3, "phase":"P1", "workstream":"color",     "title":"True Black vs Off Black — decision",                 "owner":"sami",   "handsOffTo":["alexa"],  "status":"blocked",    "start":"2026-06-15", "end":"2026-06-26", "linear":"",       "notes":"Pending" },
+    { "id":  4, "phase":"P1", "workstream":"color",     "title":"Purple ramp — decision",                             "owner":"sami",   "handsOffTo":["alexa"],  "status":"blocked",    "start":"2026-06-15", "end":"2026-06-26", "linear":"",       "notes":"Pending" },
+    { "id":  5, "phase":"P1", "workstream":"icons",     "title":"Icons → all black — spec",                           "owner":"sami",   "handsOffTo":["amanda"], "status":"to-ticket",  "start":"2026-06-22", "end":"2026-06-26", "linear":"",       "notes":"" },
+    { "id":  6, "phase":"P1", "workstream":"icons",     "title":"Consolidate repeating icons — spec",                 "owner":"sami",   "handsOffTo":["amanda"], "status":"to-ticket",  "start":"2026-06-29", "end":"2026-07-17", "linear":"",       "notes":"" },
+    { "id":  7, "phase":"P1", "workstream":"icons",     "title":"Material chevron/back/close — decision",             "owner":"sami",   "handsOffTo":[],         "status":"blocked",    "start":"2026-06-22", "end":"2026-07-03", "linear":"",       "notes":"Pending" },
+    { "id":  8, "phase":"P1", "workstream":"component", "title":"Button — design",                                    "owner":"sami",   "handsOffTo":["amanda"], "status":"in-design",  "start":"2026-06-22", "end":"2026-07-03", "linear":"",       "notes":"" },
+    { "id":  9, "phase":"P1", "workstream":"component", "title":"Inline link text (purple, no underline) — design",   "owner":"sami",   "handsOffTo":["amanda"], "status":"in-design",  "start":"2026-06-29", "end":"2026-07-03", "linear":"",       "notes":"" },
+    { "id": 10, "phase":"P1", "workstream":"component", "title":"Status pill + badge label — design",                 "owner":"sami",   "handsOffTo":["amanda"], "status":"in-design",  "start":"2026-07-06", "end":"2026-07-17", "linear":"",       "notes":"" },
+    { "id": 11, "phase":"P1", "workstream":"component", "title":"Selector Card — design",                             "owner":"sami",   "handsOffTo":["amanda"], "status":"in-design",  "start":"2026-07-06", "end":"2026-07-17", "linear":"",       "notes":"" },
+    { "id": 12, "phase":"P1", "workstream":"brand",     "title":"Gradient illustration container — spec (due 06/18)", "owner":"sami",   "handsOffTo":["emily"],  "status":"in-design",  "start":"2026-06-15", "end":"2026-06-19", "linear":"",       "notes":"Kickoff of handoff chain" },
+    { "id": 13, "phase":"P1", "workstream":"type",      "title":"Line-height / padding — decision",                   "owner":"sami",   "handsOffTo":[],         "status":"blocked",    "start":"2026-06-22", "end":"2026-07-03", "linear":"",       "notes":"Pending" },
+    { "id": 14, "phase":"P1", "workstream":"type",      "title":"Remap type tokens w/ font — spec",                   "owner":"sami",   "handsOffTo":["amanda"], "status":"to-ticket",  "start":"2026-07-06", "end":"2026-07-17", "linear":"",       "notes":"Blocked on licensing" },
+    { "id": 15, "phase":"P1", "workstream":"type",      "title":"Label token cleanup — spec",                         "owner":"sami",   "handsOffTo":["amanda"], "status":"in-design",  "start":"2026-06-29", "end":"2026-07-10", "linear":"",       "notes":"" },
+
+    { "id": 16, "phase":"P1", "workstream":"color",     "title":"Primitive color remap",                              "owner":"amanda", "handsOffTo":[],         "status":"done",       "start":"2026-06-15", "end":"2026-06-19", "linear":"DS-179", "notes":"" },
+    { "id": 17, "phase":"P1", "workstream":"color",     "title":"Semantic color remap",                               "owner":"amanda", "handsOffTo":[],         "status":"done",       "start":"2026-06-15", "end":"2026-06-19", "linear":"DS-175", "notes":"" },
+    { "id": 18, "phase":"P1", "workstream":"color",     "title":"Component color cleanup — build",                    "owner":"amanda", "handsOffTo":[],         "status":"in-eng",     "start":"2026-06-22", "end":"2026-07-10", "linear":"",       "notes":"" },
+    { "id": 19, "phase":"P1", "workstream":"icons",     "title":"Icons → all black — build",                         "owner":"amanda", "handsOffTo":[],         "status":"in-eng",     "start":"2026-06-29", "end":"2026-07-10", "linear":"",       "notes":"" },
+    { "id": 20, "phase":"P1", "workstream":"component", "title":"Button — build",                                     "owner":"amanda", "handsOffTo":[],         "status":"in-eng",     "start":"2026-06-29", "end":"2026-07-10", "linear":"",       "notes":"" },
+    { "id": 21, "phase":"P1", "workstream":"component", "title":"Inline link text — build",                           "owner":"amanda", "handsOffTo":[],         "status":"to-ticket",  "start":"2026-07-06", "end":"2026-07-10", "linear":"",       "notes":"" },
+    { "id": 22, "phase":"P1", "workstream":"component", "title":"Status pill + badge label — build",                  "owner":"amanda", "handsOffTo":[],         "status":"to-ticket",  "start":"2026-07-13", "end":"2026-07-24", "linear":"",       "notes":"" },
+    { "id": 23, "phase":"P1", "workstream":"component", "title":"Selector Card — build",                              "owner":"amanda", "handsOffTo":[],         "status":"to-ticket",  "start":"2026-07-13", "end":"2026-07-24", "linear":"",       "notes":"" },
+    { "id": 24, "phase":"P1", "workstream":"brand",     "title":"Remove gradient backgrounds",                        "owner":"amanda", "handsOffTo":[],         "status":"done",       "start":"2026-06-15", "end":"2026-06-19", "linear":"DS-182", "notes":"" },
+    { "id": 25, "phase":"P1", "workstream":"brand",     "title":"Gradient illustrations — land in code",              "owner":"amanda", "handsOffTo":[],         "status":"to-ticket",  "start":"2026-06-29", "end":"2026-07-10", "linear":"",       "notes":"After Emily export" },
+    { "id": 26, "phase":"P1", "workstream":"type",      "title":"Remap type tokens w/ font — build",                  "owner":"amanda", "handsOffTo":[],         "status":"to-ticket",  "start":"2026-07-13", "end":"2026-07-24", "linear":"",       "notes":"" },
+    { "id": 27, "phase":"P1", "workstream":"type",      "title":"Left alignment to text stacks",                      "owner":"amanda", "handsOffTo":[],         "status":"done",       "start":"2026-06-15", "end":"2026-06-19", "linear":"",       "notes":"" },
+    { "id": 28, "phase":"P1", "workstream":"spacing",   "title":"Margins + gaps",                                     "owner":"amanda", "handsOffTo":[],         "status":"done",       "start":"2026-06-15", "end":"2026-06-19", "linear":"",       "notes":"" },
+    { "id": 29, "phase":"P2", "workstream":"spacing",   "title":"Component-level spacing tokens (semantic)",          "owner":"amanda", "handsOffTo":[],         "status":"not-started","start":"2026-07-27", "end":"2026-08-07", "linear":"",       "notes":"" },
+    { "id": 30, "phase":"P2", "workstream":"shape",     "title":"Radii tokens",                                       "owner":"amanda", "handsOffTo":[],         "status":"not-started","start":"2026-07-27", "end":"2026-08-07", "linear":"",       "notes":"" },
+
+    { "id": 31, "phase":"P1", "workstream":"brand",     "title":"Gradient illustrations — resize + export",           "owner":"emily",  "handsOffTo":["amanda"], "status":"to-ticket",  "start":"2026-06-22", "end":"2026-07-03", "linear":"",       "notes":"From Sami container spec" },
+
+    { "id": 32, "phase":"P1", "workstream":"type",      "title":"Font licensing",                                     "owner":"alexa",  "handsOffTo":["isaac"],  "status":"blocked",    "start":"2026-06-15", "end":"2026-07-10", "linear":"",       "notes":"Blocks type remap" },
+
+    { "id": 33, "phase":"P2", "workstream":"templates", "title":"Core screen template consolidation",                 "owner":"sami",   "handsOffTo":["amanda"], "status":"not-started","start":"2026-07-27", "end":"2026-08-07", "linear":"",       "notes":"Alerts/Forms/Loading/Onboarding" },
+    { "id": 34, "phase":"P2", "workstream":"onebill",   "title":"Onebill support (TBD)",                              "owner":"sami",   "handsOffTo":[],         "status":"not-started","start":"2026-08-03", "end":"2026-08-07", "linear":"",       "notes":"TBD" }
+  ]
+}
