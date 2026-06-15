@@ -14,6 +14,18 @@
       </div>
       <div class="header-right">
         <div class="toolbar">
+          <div class="filter-wrap">
+            <button id="btn-filter" title="Filter items">Filter</button>
+            <div id="filter-popover" class="hidden">
+              <div class="filter-pop-head">
+                <span>Filters</span>
+                <button id="btn-clear-filters">Clear all</button>
+              </div>
+              <div class="filter-section"><span class="filter-label">Phase</span><div id="filter-phase" class="filter-group"></div></div>
+              <div class="filter-section"><span class="filter-label">Status</span><div id="filter-status" class="filter-group"></div></div>
+              <div class="filter-section"><span class="filter-label">Workstream</span><div id="filter-workstream" class="filter-group"></div></div>
+            </div>
+          </div>
           <button id="btn-manage" title="Manage people, workstreams, statuses, phases & key dates">⚙ Manage</button>
           <button id="btn-share" title="Share link">Share</button>
           <button id="btn-export" title="Export JSON">Export</button>
@@ -23,15 +35,6 @@
         </div>
       </div>
     </header>
-
-    <div id="filters">
-      <span class="filter-label">Filter:</span>
-      <div id="filter-phase" class="filter-group"></div>
-      <div class="filter-sep"></div>
-      <div id="filter-status" class="filter-group"></div>
-      <div class="filter-sep"></div>
-      <div id="filter-workstream" class="filter-group"></div>
-    </div>
 
     <div id="legend">
       <span class="legend-label">Status:</span>
@@ -63,6 +66,9 @@
         <label>End<input id="f-end" type="date" /></label>
         <label>Hands off to
           <select id="f-handoff" multiple></select>
+        </label>
+        <label>Connects to (arrows)
+          <select id="f-linksto" multiple></select>
         </label>
         <label>Linear ticket<input id="f-linear" type="text" placeholder="DS-179" /></label>
         <label class="full">Notes<textarea id="f-notes" rows="2"></textarea></label>

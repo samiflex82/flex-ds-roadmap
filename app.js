@@ -38,6 +38,7 @@ function weekStart(refDate) {
 function buildWeeks() {
   const allDates = DATA.items.flatMap(i => [parseDate(i.start), parseDate(i.end)]);
   allDates.push(parseDate(DATA.meta.codeCompleteDate), parseDate(DATA.meta.deployDate));
+  if (DATA.meta.timelineStart) allDates.push(parseDate(DATA.meta.timelineStart));
   const earliest = weekStart(new Date(Math.min(...allDates)));
   const latest   = weekStart(new Date(Math.max(...allDates)));
   const weeks = [];
@@ -54,22 +55,29 @@ function weekIndex(date, weeks) {
   return weeks.findIndex(w => w.getTime() === ms);
 }
 
+// Working-day offset within its week: Mon=0 … Fri=4, weekends clamped to Fri.
+function workdayOffset(date) {
+  const day = date.getDay();          // 0=Sun..6=Sat
+  if (day === 0) return 4;            // Sun → Fri
+  if (day === 6) return 4;            // Sat → Fri
+  return day - 1;                     // Mon(1)→0 … Fri(5)→4
+}
+
 // X is relative to the grid origin (the cards-layer lives inside .swimlane-grid,
-// which already starts after the 200px label column).
+// which already starts after the 200px label column). Columns are Mon–Fri (5 days).
 function dateToX(date, weeks) {
   const ws = weekStart(date).getTime();
   const idx = weeks.findIndex(w => w.getTime() === ws);
   if (idx < 0) return -1;
-  const dayOffset = (date.getTime() - ws) / DAY_MS;
-  return idx * COL_W + (dayOffset / 7) * COL_W;
+  return idx * COL_W + (workdayOffset(date) / 5) * COL_W;
 }
 
 function xToDate(x, weeks) {
   const rawIdx = x / COL_W;
   const weekIdx = Math.max(0, Math.min(weeks.length - 1, Math.floor(rawIdx)));
   const dayFrac = rawIdx - weekIdx;
-  const days = Math.round(dayFrac * 7);
-  return addDays(weeks[weekIdx], days);
+  const workday = Math.max(0, Math.min(4, Math.round(dayFrac * 5)));  // snap to Mon–Fri
+  return addDays(weeks[weekIdx], workday);
 }
 
 function fmtShort(d) {
@@ -105,6 +113,11 @@ function slugify(s) {
 }
 function hashStr(s){let h=0;for(let i=0;i<s.length;i++){h=(h*31+s.charCodeAt(i))|0;}return h;}
 
+function escapeHtml(s) {
+  return String(s ?? '').replace(/[&<>"']/g, c =>
+    ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+
 // ─── Persistence ─────────────────────────────────────────────────────────────
 function save() {
   localStorage.setItem('flex-ds-roadmap', JSON.stringify(DATA));
@@ -134,6 +147,7 @@ function renderWeekHeaders(weeks) {
   const depDate = parseDate(DATA.meta.deployDate);
   const ccWeek  = weekStart(ccDate).getTime();
   const depWeek = weekStart(depDate).getTime();
+  const todayWeek = weekStart(new Date()).getTime();
 
   const container = document.getElementById('week-headers');
   container.innerHTML = '';
@@ -144,12 +158,14 @@ function renderWeekHeaders(weeks) {
     const fri = addDays(w, 4);
     const isCC  = w.getTime() === ccWeek;
     const isDep = w.getTime() === depWeek;
+    const isToday = w.getTime() === todayWeek;
+    if (isToday) div.classList.add('target-today');
     if (isCC)  div.classList.add('target-cc');
     if (isDep) div.classList.add('target-deploy');
-    const badge = isCC ? '◆ Code Complete' : isDep ? '🚀 Deploy' : '';
+    const badge = isCC ? '◆ Code Complete' : isDep ? '🚀 Deploy' : isToday ? '● This week' : '';
     div.innerHTML = `
       <span class="week-label">${w.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>
-      <span class="week-dates">${isDep||isCC ? badge : '→ ' + fri.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>
+      <span class="week-dates">${(isDep||isCC||isToday) ? badge : '→ ' + fri.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>
     `;
     container.appendChild(div);
   });
@@ -175,7 +191,8 @@ function renderFilters() {
         dot.style.background = accent;
         btn.prepend(dot);
       }
-      btn.onclick = () => {
+      btn.onclick = (ev) => {
+        ev.stopPropagation();   // keep popover open; avoid detached-node close handler
         if (filterSet.has(v)) filterSet.delete(v); else filterSet.add(v);
         render();
       };
@@ -184,8 +201,31 @@ function renderFilters() {
   }
   makeGroup('filter-phase',      allPhases,   filters.phase,      v => phaseById(v)?.label || v);
   makeGroup('filter-status',     allStatuses, filters.status,     statusLabel,                 v => statusById(v)?.bg);
-  makeGroup('filter-workstream', allWS,       filters.workstream, v => wsById(v)?.label || v,  v => wsById(v)?.color);
+  makeGroup('filter-workstream', allWS,       filters.workstream, v => `${wsById(v)?.icon || ''} ${wsById(v)?.label || v}`.trim(), v => wsById(v)?.color);
+
+  // active-filter count on the Filter button
+  const count = filters.phase.size + filters.status.size + filters.workstream.size;
+  const btn = document.getElementById('btn-filter');
+  btn.textContent = count ? `Filter · ${count}` : 'Filter';
+  btn.classList.toggle('has-filters', count > 0);
 }
+
+// Filter popover open/close + clear all
+document.getElementById('btn-filter').onclick = e => {
+  e.stopPropagation();
+  document.getElementById('filter-popover').classList.toggle('hidden');
+};
+document.getElementById('btn-clear-filters').onclick = (e) => {
+  e.stopPropagation();
+  filters = { phase: new Set(), status: new Set(), workstream: new Set() };
+  render();
+};
+// close popover on outside click
+document.addEventListener('click', e => {
+  const pop = document.getElementById('filter-popover');
+  if (pop.classList.contains('hidden')) return;
+  if (!e.target.closest('.filter-wrap')) pop.classList.add('hidden');
+});
 
 function renderLegend() {
   const c = document.getElementById('legend-swatches');
@@ -207,6 +247,7 @@ function renderSwimlanes(weeks) {
   const items = visibleItems();
   const ccWeek  = weekStart(parseDate(DATA.meta.codeCompleteDate)).getTime();
   const depWeek = weekStart(parseDate(DATA.meta.deployDate)).getTime();
+  const todayWeek = weekStart(new Date()).getTime();
 
   DATA.people.forEach(person => {
     const personItems = items.filter(i => i.owner === person.id);
@@ -229,6 +270,7 @@ function renderSwimlanes(weeks) {
     weeks.forEach(w => {
       const col = document.createElement('div');
       col.className = 'grid-col';
+      if (w.getTime() === todayWeek) col.classList.add('target-today');
       if (w.getTime() === ccWeek)  col.classList.add('target-cc');
       if (w.getTime() === depWeek) col.classList.add('target-deploy');
       grid.appendChild(col);
@@ -276,7 +318,7 @@ function buildCard(item, weeks, track) {
   const startDate = parseDate(item.start);
   const endDate   = parseDate(item.end);
   const x1 = dateToX(startDate, weeks);
-  const x2 = dateToX(endDate, weeks) + (COL_W / 7) * 1; // end of end-day
+  const x2 = dateToX(endDate, weeks) + (COL_W / 5) * 1; // fill through the end workday (Mon–Fri basis)
   const w  = Math.max(x2 - x1, 20);
   if (x1 < 0 || w < 1) return null;
 
@@ -295,43 +337,51 @@ function buildCard(item, weeks, track) {
   if (ws) { card.style.borderLeft = `3px solid ${ws.color}`; }
 
   const linear = item.linear ? ` · ${item.linear}` : '';
+  const wsIcon = ws?.icon ? `${ws.icon} ` : '';
   card.innerHTML = `
-    <div class="card-title">${item.title}</div>
+    <div class="card-title">${wsIcon}${escapeHtml(item.title)}</div>
     <div class="card-meta">${statusLabel(item.status)}${linear}</div>
     ${item.handsOffTo?.length ? '<div class="card-handoff-dot" title="Has handoff"></div>' : ''}
+    <div class="link-handle" title="Drag to another card to connect"></div>
     <div class="resize-handle"></div>
   `;
 
-  // Click to edit (not drag)
+  // Click to edit (not drag/connect)
   card.addEventListener('click', e => {
     if (card.classList.contains('dragging')) return;
     if (e.target.classList.contains('resize-handle')) return;
+    if (e.target.classList.contains('link-handle')) return;
     openModal(item.id);
   });
 
   setupDrag(card, item, weeks);
   setupResize(card.querySelector('.resize-handle'), item, weeks);
+  setupConnect(card.querySelector('.link-handle'), item, weeks);
   return card;
 }
 
-// ─── Drag ─────────────────────────────────────────────────────────────────────
+// ─── Drag (move dates horizontally + reassign owner vertically) ───────────────
 function setupDrag(card, item, weeks) {
-  let startX, origLeft, origWidth, dragged = false;
+  let startX, startY, origLeft, origTop, dragged = false;
 
   card.addEventListener('mousedown', e => {
     if (e.target.classList.contains('resize-handle')) return;
+    if (e.target.classList.contains('link-handle')) return;
     e.preventDefault();
     startX = e.clientX;
+    startY = e.clientY;
     origLeft = parseInt(card.style.left);
-    origWidth = parseInt(card.style.width);
+    origTop  = parseInt(card.style.top);
     dragged = false;
 
     function onMove(e) {
       const dx = e.clientX - startX;
-      if (Math.abs(dx) > 3) dragged = true;
+      const dy = e.clientY - startY;
+      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragged = true;
       if (!dragged) return;
       card.classList.add('dragging');
       card.style.left = (origLeft + dx) + 'px';
+      card.style.top  = (origTop + dy) + 'px';   // follow cursor vertically too
     }
 
     function onUp(e) {
@@ -339,18 +389,81 @@ function setupDrag(card, item, weeks) {
       document.removeEventListener('mouseup', onUp);
       if (!dragged) { card.classList.remove('dragging'); return; }
 
+      // new dates from horizontal position
       const dx = e.clientX - startX;
-      const newLeft = origLeft + dx;
-      const newStart = xToDate(newLeft, weeks);
+      const newStart = xToDate(origLeft + dx, weeks);
       const duration = parseDate(item.end).getTime() - parseDate(item.start).getTime();
       const newEnd = new Date(newStart.getTime() + duration);
-
       item.start = fmtDate(newStart);
       item.end   = fmtDate(newEnd);
+
+      // new owner from the lane under the cursor (skip the dragged card itself)
+      card.style.pointerEvents = 'none';
+      const under = document.elementFromPoint(e.clientX, e.clientY);
+      card.style.pointerEvents = '';
+      const lane = under && under.closest('.swimlane');
+      if (lane && lane.dataset.owner && lane.dataset.owner !== item.owner) {
+        item.owner = lane.dataset.owner;
+      }
+
       save();
       render();
     }
 
+    document.addEventListener('mousemove', onMove);
+    document.addEventListener('mouseup', onUp);
+  });
+}
+
+// ─── Connect: drag the link-handle onto another card to create a connection ────
+function setupConnect(handle, item, weeks) {
+  if (!handle) return;
+  handle.addEventListener('mousedown', e => {
+    e.preventDefault();
+    e.stopPropagation();
+    const outer = document.getElementById('timeline-outer');
+    const wrap = document.getElementById('timeline-wrap');
+    const startCard = handle.closest('.card');
+
+    // temp line in the arrows svg layer
+    let svg = document.getElementById('arrows-svg');
+    const tmp = document.createElementNS('http://www.w3.org/2000/svg','path');
+    tmp.setAttribute('stroke', '#7c6fcd');
+    tmp.setAttribute('stroke-width', '2');
+    tmp.setAttribute('fill', 'none');
+    if (svg) svg.appendChild(tmp);
+
+    function ptInOuter(clientX, clientY) {
+      const r = outer.getBoundingClientRect();
+      return { x: clientX - r.left + wrap.scrollLeft, y: clientY - r.top + wrap.scrollTop };
+    }
+    const sRect = startCard.getBoundingClientRect();
+    const start = ptInOuter(sRect.right, sRect.top + sRect.height / 2);
+
+    function onMove(e) {
+      const p = ptInOuter(e.clientX, e.clientY);
+      tmp.setAttribute('d', `M${start.x},${start.y} L${p.x},${p.y}`);
+    }
+    function onUp(e) {
+      document.removeEventListener('mousemove', onMove);
+      document.removeEventListener('mouseup', onUp);
+      if (tmp.parentNode) tmp.remove();
+      handle.style.pointerEvents = 'none';
+      const under = document.elementFromPoint(e.clientX, e.clientY);
+      handle.style.pointerEvents = '';
+      const targetCard = under && under.closest('.card');
+      if (targetCard) {
+        const targetId = Number(targetCard.dataset.id);
+        if (targetId !== item.id) {
+          item.linksTo = item.linksTo || [];
+          const i = item.linksTo.indexOf(targetId);
+          if (i >= 0) item.linksTo.splice(i, 1);   // toggle off if already linked
+          else item.linksTo.push(targetId);
+          save();
+          render();
+        }
+      }
+    }
     document.addEventListener('mousemove', onMove);
     document.addEventListener('mouseup', onUp);
   });
@@ -418,27 +531,23 @@ function renderArrows(weeks) {
   svg.appendChild(defs);
 
   const items = visibleItems();
+  const visibleIds = new Set(items.map(i => i.id));
+  const outerRect = outer.getBoundingClientRect();
+  const scrollLeft = document.getElementById('timeline-wrap').scrollLeft;
+  const scrollTop  = document.getElementById('timeline-wrap').scrollTop;
+
   items.forEach(item => {
-    if (!item.handsOffTo?.length) return;
+    if (!item.linksTo?.length) return;
     const fromCard = document.querySelector(`.card[data-id="${item.id}"]`);
     if (!fromCard) return;
 
-    item.handsOffTo.forEach(toOwner => {
-      // find card owned by toOwner that starts after item.end and depends on this workstream
-      const toItem = items.find(it =>
-        it.owner === toOwner &&
-        it.workstream === item.workstream &&
-        parseDate(it.start) >= parseDate(item.end)
-      );
-      if (!toItem) return;
-      const toCard = document.querySelector(`.card[data-id="${toItem.id}"]`);
+    item.linksTo.forEach(toId => {
+      if (!visibleIds.has(toId)) return;            // target filtered out — skip
+      const toCard = document.querySelector(`.card[data-id="${toId}"]`);
       if (!toCard) return;
 
       const fromRect = fromCard.getBoundingClientRect();
       const toRect   = toCard.getBoundingClientRect();
-      const outerRect = outer.getBoundingClientRect();
-      const scrollLeft = document.getElementById('timeline-wrap').scrollLeft;
-      const scrollTop  = document.getElementById('timeline-wrap').scrollTop;
 
       const x1 = fromRect.right  - outerRect.left + scrollLeft;
       const y1 = fromRect.top    - outerRect.top  + scrollTop + fromRect.height / 2;
@@ -447,15 +556,33 @@ function renderArrows(weeks) {
 
       const cx1 = x1 + 30;
       const cx2 = x2 - 30;
+      const d = `M${x1},${y1} C${cx1},${y1} ${cx2},${y2} ${x2},${y2}`;
 
+      // visible line
       const line = document.createElementNS('http://www.w3.org/2000/svg','path');
-      line.setAttribute('d', `M${x1},${y1} C${cx1},${y1} ${cx2},${y2} ${x2},${y2}`);
-      line.setAttribute('stroke', 'rgba(255,255,255,0.2)');
+      line.setAttribute('d', d);
+      line.setAttribute('stroke', 'rgba(167,139,250,0.55)');
       line.setAttribute('stroke-width', '1.5');
       line.setAttribute('fill', 'none');
       line.setAttribute('stroke-dasharray', '4 3');
       line.setAttribute('marker-end', 'url(#arrow)');
       svg.appendChild(line);
+
+      // fat invisible hit-target to click-remove the link
+      const hit = document.createElementNS('http://www.w3.org/2000/svg','path');
+      hit.setAttribute('d', d);
+      hit.setAttribute('stroke', 'transparent');
+      hit.setAttribute('stroke-width', '12');
+      hit.setAttribute('fill', 'none');
+      hit.style.cursor = 'pointer';
+      hit.style.pointerEvents = 'stroke';
+      hit.addEventListener('click', () => {
+        if (!confirm('Remove this connection?')) return;
+        item.linksTo = item.linksTo.filter(id => id !== toId);
+        save();
+        render();
+      });
+      svg.appendChild(hit);
     });
   });
 }
@@ -486,6 +613,16 @@ function openModal(itemId) {
     `<option value="${p.id}" ${!isNew && item.handsOffTo?.includes(p.id) ? 'selected' : ''}>${p.name}</option>`
   ).join('');
 
+  // connects-to select (all other items, owner-prefixed)
+  const linkSel = document.getElementById('f-linksto');
+  linkSel.innerHTML = DATA.items
+    .filter(it => it.id !== itemId)
+    .map(it => {
+      const owner = personById(it.owner)?.name || '';
+      const sel = !isNew && item.linksTo?.includes(it.id) ? 'selected' : '';
+      return `<option value="${it.id}" ${sel}>${escapeHtml(it.title)} — ${escapeHtml(owner)}</option>`;
+    }).join('');
+
   // phase select (data-driven)
   document.getElementById('f-phase').innerHTML = DATA.phases.map(p =>
     `<option value="${p.id}">${p.label}</option>`).join('');
@@ -514,6 +651,7 @@ document.getElementById('modal-save').onclick = () => {
   const title = document.getElementById('f-title').value.trim();
   if (!title) { alert('Title required'); return; }
   const handoff = [...document.getElementById('f-handoff').selectedOptions].map(o => o.value);
+  const linksTo = [...document.getElementById('f-linksto').selectedOptions].map(o => Number(o.value));
 
   if (editingId === null) {
     // new item
@@ -525,6 +663,7 @@ document.getElementById('modal-save').onclick = () => {
       title,
       owner:      document.getElementById('f-owner').value,
       handsOffTo: handoff,
+      linksTo,
       status:     document.getElementById('f-status').value,
       start:      document.getElementById('f-start').value,
       end:        document.getElementById('f-end').value,
@@ -539,6 +678,7 @@ document.getElementById('modal-save').onclick = () => {
       workstream: document.getElementById('f-workstream').value,
       owner:      document.getElementById('f-owner').value,
       handsOffTo: handoff,
+      linksTo,
       status:     document.getElementById('f-status').value,
       start:      document.getElementById('f-start').value,
       end:        document.getElementById('f-end').value,
@@ -553,7 +693,10 @@ document.getElementById('modal-save').onclick = () => {
 
 document.getElementById('modal-delete').onclick = () => {
   if (!confirm('Delete this item?')) return;
-  DATA.items = DATA.items.filter(i => i.id !== editingId);
+  const goneId = editingId;
+  DATA.items = DATA.items.filter(i => i.id !== goneId);
+  // drop any connections pointing at the deleted item
+  DATA.items.forEach(i => { if (i.linksTo) i.linksTo = i.linksTo.filter(id => id !== goneId); });
   save();
   closeModal();
   render();
@@ -682,27 +825,69 @@ function renderSettingsList(listKey, containerId) {
       row.appendChild(role);
     }
 
-    // delete
+    // emoji icon for workstreams
+    if (listKey === 'workstreams') {
+      const icon = document.createElement('input');
+      icon.type = 'text';
+      icon.value = entry.icon || '';
+      icon.placeholder = '🎨';
+      icon.className = 'icon-input';
+      icon.maxLength = 4;
+      icon.oninput = () => { entry.icon = icon.value; save(); render(); };
+      row.appendChild(icon);
+    }
+
+    // delete (with reassignment when in use)
     const del = document.createElement('button');
     del.className = 'row-delete';
     const used = usageCount(listKey, entry.id);
-    if (used > 0) {
-      del.textContent = `in use (${used})`;
-      del.disabled = true;
-      del.title = 'Reassign these items before deleting';
-    } else {
-      del.textContent = '✕';
-      del.title = 'Delete';
-      del.onclick = () => {
-        DATA[listKey].splice(idx, 1);
-        save();
-        renderSettingsLists();
-        render();
-      };
-    }
+    del.textContent = used > 0 ? `✕ (${used})` : '✕';
+    del.title = used > 0 ? `Used by ${used} item(s) — reassign on delete` : 'Delete';
+    del.onclick = () => startDelete(listKey, idx, entry, used, row);
     row.appendChild(del);
     c.appendChild(row);
   });
+}
+
+// Delete a list entry; if in use, require reassigning its items to another entry first.
+function startDelete(listKey, idx, entry, used, row) {
+  if (used === 0) {
+    DATA[listKey].splice(idx, 1);
+    save(); renderSettingsLists(); render();
+    return;
+  }
+  const others = DATA[listKey].filter(e => e.id !== entry.id);
+  if (!others.length) {
+    alert(`Can't delete the last ${listKey.replace(/s$/,'')} while ${used} item(s) use it. Add another first.`);
+    return;
+  }
+  // inline reassignment UI in place of the row's controls
+  const labelOf = e => listKey === 'people' ? e.name : e.label;
+  const picker = document.createElement('div');
+  picker.className = 'reassign-bar';
+  picker.innerHTML = `<span>Move ${used} item(s) to:</span>`;
+  const sel = document.createElement('select');
+  sel.innerHTML = others.map(e => `<option value="${e.id}">${escapeHtml(labelOf(e) || e.id)}</option>`).join('');
+  const go = document.createElement('button');
+  go.className = 'btn-primary'; go.textContent = 'Move & delete';
+  const cancel = document.createElement('button');
+  cancel.id = 'reassign-cancel'; cancel.textContent = 'Cancel';
+  go.onclick = () => { reassignAndDelete(listKey, entry.id, sel.value); save(); renderSettingsLists(); render(); };
+  cancel.onclick = () => renderSettingsLists();
+  picker.append(sel, go, cancel);
+  row.replaceWith(picker);
+}
+
+function reassignAndDelete(listKey, fromId, toId) {
+  DATA.items.forEach(it => {
+    if (listKey === 'people') {
+      if (it.owner === fromId) it.owner = toId;
+      if (it.handsOffTo) it.handsOffTo = [...new Set(it.handsOffTo.map(o => o === fromId ? toId : o))];
+    } else if (listKey === 'workstreams' && it.workstream === fromId) it.workstream = toId;
+    else if (listKey === 'statuses' && it.status === fromId) it.status = toId;
+    else if (listKey === 'phases'   && it.phase  === fromId) it.phase  = toId;
+  });
+  DATA[listKey] = DATA[listKey].filter(e => e.id !== fromId);
 }
 
 // + Add buttons
@@ -739,44 +924,87 @@ document.getElementById('btn-share').onclick = () => {
   document.body.appendChild(banner);
 };
 
+// ─── Migration (non-destructive: keep the user's edits, layer in new structure) ─
+function seedLinksFromHandoff(items) {
+  items.forEach(item => {
+    (item.handsOffTo || []).forEach(toOwner => {
+      const target = items.find(it =>
+        it.owner === toOwner &&
+        it.workstream === item.workstream &&
+        parseDate(it.start) >= parseDate(item.end)
+      );
+      if (target && target.id !== item.id && !item.linksTo.includes(target.id)) {
+        item.linksTo.push(target.id);
+      }
+    });
+  });
+}
+
+function migrate(data) {
+  data.meta = data.meta || {};
+  const v = data.meta.seedVersion ?? 0;
+
+  // always guarantee shape
+  data.items = data.items || [];
+  const statusRemap = { 'in-eng': 'in-development', 'not-started': 'backlog', '': 'backlog' };
+
+  if (v < 3) {
+    // global taxonomy: adopt the new status list (safe — it's config, not her item data)
+    if (SEED?.statuses) data.statuses = SEED.statuses;
+    if (!data.phases) data.phases = SEED?.phases || [{id:'P1',label:'P1'},{id:'P2',label:'P2'},{id:'P3',label:'P3'}];
+    // merge workstream icons by id without touching her labels/colors
+    const iconById = {};
+    (SEED?.workstreams || []).forEach(w => { if (w.icon) iconById[w.id] = w.icon; });
+    (data.workstreams || []).forEach(w => { if (!w.icon && iconById[w.id]) w.icon = iconById[w.id]; });
+    if (SEED?.meta?.timelineStart && !data.meta.timelineStart) data.meta.timelineStart = SEED.meta.timelineStart;
+  }
+
+  // per-item: remap statuses, default phase, ensure arrays
+  data.items.forEach(it => {
+    it.status = statusRemap[it.status] ?? (it.status || 'backlog');
+    if (!it.phase) it.phase = 'P1';
+    it.handsOffTo = it.handsOffTo || [];
+    if (!Array.isArray(it.linksTo)) it.linksTo = [];
+  });
+  // if she had no explicit links yet, convert today's auto-arrows into editable ones (once)
+  if (v < 3 && !data.items.some(it => it.linksTo.length)) seedLinksFromHandoff(data.items);
+
+  data.meta.seedVersion = Math.max(v, SEED?.meta?.seedVersion ?? v, 3);
+}
+
+// ─── Initial scroll to the current week (once) ────────────────────────────────
+let didInitialScroll = false;
+function scrollToCurrentWeek() {
+  if (didInitialScroll) return;
+  didInitialScroll = true;
+  const weeks = buildWeeks();
+  const idx = weeks.findIndex(w => w.getTime() === weekStart(new Date()).getTime());
+  if (idx > 0) {
+    requestAnimationFrame(() => { document.getElementById('timeline-wrap').scrollLeft = idx * COL_W; });
+  }
+}
+
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 async function boot() {
-  // always fetch bundled seed so we can compare versions / offer reset
+  // always fetch bundled seed so we can migrate / reset against it
   try {
     const resp = await fetch('./data.json', { cache: 'no-store' });
     SEED = await resp.json();
   } catch { SEED = null; }
 
   const saved = localStorage.getItem('flex-ds-roadmap');
-  if (saved) {
-    let parsed = null;
-    try { parsed = JSON.parse(saved); } catch {}
-    if (parsed) {
-      const savedV  = parsed.meta?.seedVersion ?? 0;
-      const seedV   = SEED?.meta?.seedVersion ?? 0;
-      if (SEED && seedV !== savedV) {
-        const ok = confirm(
-          'An updated roadmap is available (v' + seedV + ').\n\n' +
-          'Load it? This replaces your local changes.\n' +
-          'Cancel to keep your current version.'
-        );
-        if (ok) { loadData(JSON.parse(JSON.stringify(SEED))); save(); return; }
-        // keep local, but stop nagging on every load
-        parsed.meta = parsed.meta || {};
-        parsed.meta.seedVersion = seedV;
-        DATA = parsed; save(); render(); return;
-      }
-      // migrate: if old data is missing statuses/phases, graft from seed silently
-      if (SEED && (!parsed.statuses || !parsed.phases)) {
-        parsed.statuses = SEED.statuses;
-        parsed.phases   = SEED.phases;
-      }
-      DATA = parsed; save(); render(); return;
-    }
+  let parsed = null;
+  if (saved) { try { parsed = JSON.parse(saved); } catch {} }
+
+  if (parsed) {
+    migrate(parsed);          // in-place, non-destructive — never wipes her edits
+    DATA = parsed;
+    save();
+  } else {
+    DATA = SEED;              // fresh browser → use the committed baseline (her exported board)
   }
-  // no saved state → use seed
-  DATA = SEED;
   render();
+  scrollToCurrentWeek();
 }
 
 boot();

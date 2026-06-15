@@ -1,80 +1,566 @@
 {
   "meta": {
     "title": "Flex DS — Dark Matter Roadmap",
-    "seedVersion": 2,
+    "seedVersion": 3,
     "codeCompleteDate": "2026-07-24",
     "deployDate": "2026-07-29",
-    "startDate": "2026-06-15"
+    "startDate": "2026-06-15",
+    "timelineStart": "2026-06-01"
   },
   "people": [
-    { "id": "sami",   "name": "Sami W",   "role": "DS Designer + Ops",  "color": "#7C6FCD" },
-    { "id": "amanda", "name": "Amanda C", "role": "Lead DS Eng",        "color": "#2DA05A" },
-    { "id": "emily",  "name": "Emily C",  "role": "Production Designer", "color": "#E07B39" },
-    { "id": "alexa",  "name": "Alexa D",  "role": "DS Design Manager",   "color": "#C14D74" },
-    { "id": "isaac",  "name": "Isaac W",  "role": "DS Eng Manager",      "color": "#3B82C4" }
+    {
+      "id": "sami",
+      "name": "Sami W",
+      "role": "DS Designer + Ops",
+      "color": "#7C6FCD"
+    },
+    {
+      "id": "amanda",
+      "name": "Amanda C",
+      "role": "Lead DS Eng",
+      "color": "#2DA05A"
+    },
+    {
+      "id": "emily",
+      "name": "Emily C",
+      "role": "Production Designer",
+      "color": "#E07B39"
+    },
+    {
+      "id": "alexa",
+      "name": "Alexa D",
+      "role": "DS Design Manager",
+      "color": "#C14D74"
+    },
+    {
+      "id": "isaac",
+      "name": "Isaac W",
+      "role": "DS Eng Manager",
+      "color": "#3B82C4"
+    }
   ],
   "statuses": [
-    { "id": "done",        "label": "Done",              "bg": "#134e2a", "fg": "#86efac" },
-    { "id": "in-eng",      "label": "In eng",            "bg": "#1e3a5f", "fg": "#93c5fd" },
-    { "id": "in-design",   "label": "In design",         "bg": "#2d1b5e", "fg": "#c4b5fd" },
-    { "id": "to-ticket",   "label": "To ticket",         "bg": "#1c1c3a", "fg": "#a5b4fc" },
-    { "id": "blocked",     "label": "Blocked/decision",  "bg": "#431407", "fg": "#fdba74" },
-    { "id": "not-started", "label": "Not started",       "bg": "#1a1928", "fg": "#6b7280" }
+    {
+      "id": "backlog",
+      "label": "Backlog",
+      "bg": "#1f2430",
+      "fg": "#9aa3b8"
+    },
+    {
+      "id": "blocked",
+      "label": "Blocked",
+      "bg": "#431407",
+      "fg": "#fdba74"
+    },
+    {
+      "id": "planned",
+      "label": "Planned",
+      "bg": "#1e293b",
+      "fg": "#94a3b8"
+    },
+    {
+      "id": "next-up",
+      "label": "Next up",
+      "bg": "#312e81",
+      "fg": "#c7d2fe"
+    },
+    {
+      "id": "to-ticket",
+      "label": "To ticket",
+      "bg": "#1c1c3a",
+      "fg": "#a5b4fc"
+    },
+    {
+      "id": "in-design",
+      "label": "In design",
+      "bg": "#2d1b5e",
+      "fg": "#c4b5fd"
+    },
+    {
+      "id": "in-development",
+      "label": "In development",
+      "bg": "#0f3d3a",
+      "fg": "#5eead4"
+    },
+    {
+      "id": "in-review",
+      "label": "In review",
+      "bg": "#422006",
+      "fg": "#fcd34d"
+    },
+    {
+      "id": "done",
+      "label": "Done",
+      "bg": "#134e2a",
+      "fg": "#86efac"
+    }
   ],
   "phases": [
-    { "id": "P1", "label": "P1" },
-    { "id": "P2", "label": "P2" },
-    { "id": "P3", "label": "P3" }
+    {
+      "id": "P1",
+      "label": "P1"
+    },
+    {
+      "id": "P2",
+      "label": "P2"
+    },
+    {
+      "id": "P3",
+      "label": "P3"
+    }
   ],
   "workstreams": [
-    { "id": "color",     "label": "Color Token Remap", "color": "#6366F1" },
-    { "id": "icons",     "label": "Icons",             "color": "#F59E0B" },
-    { "id": "component", "label": "Components",        "color": "#10B981" },
-    { "id": "brand",     "label": "Brand",             "color": "#EC4899" },
-    { "id": "type",      "label": "Type",              "color": "#8B5CF6" },
-    { "id": "spacing",   "label": "Spacing",           "color": "#06B6D4" },
-    { "id": "shape",     "label": "Shape / Radii",     "color": "#84CC16" },
-    { "id": "templates", "label": "Templates",         "color": "#F97316" },
-    { "id": "onebill",   "label": "OneBill",           "color": "#A78BFA" }
+    {
+      "id": "color",
+      "label": "Color Token Remap",
+      "color": "#6366F1",
+      "icon": "🎨"
+    },
+    {
+      "id": "icons",
+      "label": "Icons",
+      "color": "#F59E0B",
+      "icon": "🔣"
+    },
+    {
+      "id": "component",
+      "label": "Components",
+      "color": "#10B981",
+      "icon": "🧩"
+    },
+    {
+      "id": "brand",
+      "label": "Brand",
+      "color": "#EC4899",
+      "icon": "✨"
+    },
+    {
+      "id": "type",
+      "label": "Type",
+      "color": "#8B5CF6",
+      "icon": "🔤"
+    },
+    {
+      "id": "spacing",
+      "label": "Spacing",
+      "color": "#06B6D4",
+      "icon": "↔️"
+    },
+    {
+      "id": "shape",
+      "label": "Shape / Radii",
+      "color": "#84CC16",
+      "icon": "⬛"
+    },
+    {
+      "id": "templates",
+      "label": "Templates",
+      "color": "#F97316",
+      "icon": "🗂️"
+    },
+    {
+      "id": "onebill",
+      "label": "OneBill",
+      "color": "#A78BFA",
+      "icon": "🧾"
+    }
   ],
   "items": [
-    { "id":  1, "phase":"P1", "workstream":"color",     "title":"Component color cleanup — spec ticket",              "owner":"sami",   "handsOffTo":["amanda"], "status":"to-ticket",  "start":"2026-06-15", "end":"2026-06-26", "linear":"",       "notes":"" },
-    { "id":  2, "phase":"P1", "workstream":"color",     "title":"VQA + remap outliers",                               "owner":"sami",   "handsOffTo":["amanda"], "status":"in-design",  "start":"2026-06-29", "end":"2026-07-17", "linear":"",       "notes":"" },
-    { "id":  3, "phase":"P1", "workstream":"color",     "title":"True Black vs Off Black — decision",                 "owner":"sami",   "handsOffTo":["alexa"],  "status":"blocked",    "start":"2026-06-15", "end":"2026-06-26", "linear":"",       "notes":"Pending" },
-    { "id":  4, "phase":"P1", "workstream":"color",     "title":"Purple ramp — decision",                             "owner":"sami",   "handsOffTo":["alexa"],  "status":"blocked",    "start":"2026-06-15", "end":"2026-06-26", "linear":"",       "notes":"Pending" },
-    { "id":  5, "phase":"P1", "workstream":"icons",     "title":"Icons → all black — spec",                           "owner":"sami",   "handsOffTo":["amanda"], "status":"to-ticket",  "start":"2026-06-22", "end":"2026-06-26", "linear":"",       "notes":"" },
-    { "id":  6, "phase":"P1", "workstream":"icons",     "title":"Consolidate repeating icons — spec",                 "owner":"sami",   "handsOffTo":["amanda"], "status":"to-ticket",  "start":"2026-06-29", "end":"2026-07-17", "linear":"",       "notes":"" },
-    { "id":  7, "phase":"P1", "workstream":"icons",     "title":"Material chevron/back/close — decision",             "owner":"sami",   "handsOffTo":[],         "status":"blocked",    "start":"2026-06-22", "end":"2026-07-03", "linear":"",       "notes":"Pending" },
-    { "id":  8, "phase":"P1", "workstream":"component", "title":"Button — design",                                    "owner":"sami",   "handsOffTo":["amanda"], "status":"in-design",  "start":"2026-06-22", "end":"2026-07-03", "linear":"",       "notes":"" },
-    { "id":  9, "phase":"P1", "workstream":"component", "title":"Inline link text (purple, no underline) — design",   "owner":"sami",   "handsOffTo":["amanda"], "status":"in-design",  "start":"2026-06-29", "end":"2026-07-03", "linear":"",       "notes":"" },
-    { "id": 10, "phase":"P1", "workstream":"component", "title":"Status pill + badge label — design",                 "owner":"sami",   "handsOffTo":["amanda"], "status":"in-design",  "start":"2026-07-06", "end":"2026-07-17", "linear":"",       "notes":"" },
-    { "id": 11, "phase":"P1", "workstream":"component", "title":"Selector Card — design",                             "owner":"sami",   "handsOffTo":["amanda"], "status":"in-design",  "start":"2026-07-06", "end":"2026-07-17", "linear":"",       "notes":"" },
-    { "id": 12, "phase":"P1", "workstream":"brand",     "title":"Gradient illustration container — spec (due 06/18)", "owner":"sami",   "handsOffTo":["emily"],  "status":"in-design",  "start":"2026-06-15", "end":"2026-06-19", "linear":"",       "notes":"Kickoff of handoff chain" },
-    { "id": 13, "phase":"P1", "workstream":"type",      "title":"Line-height / padding — decision",                   "owner":"sami",   "handsOffTo":[],         "status":"blocked",    "start":"2026-06-22", "end":"2026-07-03", "linear":"",       "notes":"Pending" },
-    { "id": 14, "phase":"P1", "workstream":"type",      "title":"Remap type tokens w/ font — spec",                   "owner":"sami",   "handsOffTo":["amanda"], "status":"to-ticket",  "start":"2026-07-06", "end":"2026-07-17", "linear":"",       "notes":"Blocked on licensing" },
-    { "id": 15, "phase":"P1", "workstream":"type",      "title":"Label token cleanup — spec",                         "owner":"sami",   "handsOffTo":["amanda"], "status":"in-design",  "start":"2026-06-29", "end":"2026-07-10", "linear":"",       "notes":"" },
-
-    { "id": 16, "phase":"P1", "workstream":"color",     "title":"Primitive color remap",                              "owner":"amanda", "handsOffTo":[],         "status":"done",       "start":"2026-06-15", "end":"2026-06-19", "linear":"DS-179", "notes":"" },
-    { "id": 17, "phase":"P1", "workstream":"color",     "title":"Semantic color remap",                               "owner":"amanda", "handsOffTo":[],         "status":"done",       "start":"2026-06-15", "end":"2026-06-19", "linear":"DS-175", "notes":"" },
-    { "id": 18, "phase":"P1", "workstream":"color",     "title":"Component color cleanup — build",                    "owner":"amanda", "handsOffTo":[],         "status":"in-eng",     "start":"2026-06-22", "end":"2026-07-10", "linear":"",       "notes":"" },
-    { "id": 19, "phase":"P1", "workstream":"icons",     "title":"Icons → all black — build",                         "owner":"amanda", "handsOffTo":[],         "status":"in-eng",     "start":"2026-06-29", "end":"2026-07-10", "linear":"",       "notes":"" },
-    { "id": 20, "phase":"P1", "workstream":"component", "title":"Button — build",                                     "owner":"amanda", "handsOffTo":[],         "status":"in-eng",     "start":"2026-06-29", "end":"2026-07-10", "linear":"",       "notes":"" },
-    { "id": 21, "phase":"P1", "workstream":"component", "title":"Inline link text — build",                           "owner":"amanda", "handsOffTo":[],         "status":"to-ticket",  "start":"2026-07-06", "end":"2026-07-10", "linear":"",       "notes":"" },
-    { "id": 22, "phase":"P1", "workstream":"component", "title":"Status pill + badge label — build",                  "owner":"amanda", "handsOffTo":[],         "status":"to-ticket",  "start":"2026-07-13", "end":"2026-07-24", "linear":"",       "notes":"" },
-    { "id": 23, "phase":"P1", "workstream":"component", "title":"Selector Card — build",                              "owner":"amanda", "handsOffTo":[],         "status":"to-ticket",  "start":"2026-07-13", "end":"2026-07-24", "linear":"",       "notes":"" },
-    { "id": 24, "phase":"P1", "workstream":"brand",     "title":"Remove gradient backgrounds",                        "owner":"amanda", "handsOffTo":[],         "status":"done",       "start":"2026-06-15", "end":"2026-06-19", "linear":"DS-182", "notes":"" },
-    { "id": 25, "phase":"P1", "workstream":"brand",     "title":"Gradient illustrations — land in code",              "owner":"amanda", "handsOffTo":[],         "status":"to-ticket",  "start":"2026-06-29", "end":"2026-07-10", "linear":"",       "notes":"After Emily export" },
-    { "id": 26, "phase":"P1", "workstream":"type",      "title":"Remap type tokens w/ font — build",                  "owner":"amanda", "handsOffTo":[],         "status":"to-ticket",  "start":"2026-07-13", "end":"2026-07-24", "linear":"",       "notes":"" },
-    { "id": 27, "phase":"P1", "workstream":"type",      "title":"Left alignment to text stacks",                      "owner":"amanda", "handsOffTo":[],         "status":"done",       "start":"2026-06-15", "end":"2026-06-19", "linear":"",       "notes":"" },
-    { "id": 28, "phase":"P1", "workstream":"spacing",   "title":"Margins + gaps",                                     "owner":"amanda", "handsOffTo":[],         "status":"done",       "start":"2026-06-15", "end":"2026-06-19", "linear":"",       "notes":"" },
-    { "id": 29, "phase":"P2", "workstream":"spacing",   "title":"Component-level spacing tokens (semantic)",          "owner":"amanda", "handsOffTo":[],         "status":"not-started","start":"2026-07-27", "end":"2026-08-07", "linear":"",       "notes":"" },
-    { "id": 30, "phase":"P2", "workstream":"shape",     "title":"Radii tokens",                                       "owner":"amanda", "handsOffTo":[],         "status":"not-started","start":"2026-07-27", "end":"2026-08-07", "linear":"",       "notes":"" },
-
-    { "id": 31, "phase":"P1", "workstream":"brand",     "title":"Gradient illustrations — resize + export",           "owner":"emily",  "handsOffTo":["amanda"], "status":"to-ticket",  "start":"2026-06-22", "end":"2026-07-03", "linear":"",       "notes":"From Sami container spec" },
-
-    { "id": 32, "phase":"P1", "workstream":"type",      "title":"Font licensing",                                     "owner":"alexa",  "handsOffTo":["isaac"],  "status":"blocked",    "start":"2026-06-15", "end":"2026-07-10", "linear":"",       "notes":"Blocks type remap" },
-
-    { "id": 33, "phase":"P2", "workstream":"templates", "title":"Core screen template consolidation",                 "owner":"sami",   "handsOffTo":["amanda"], "status":"not-started","start":"2026-07-27", "end":"2026-08-07", "linear":"",       "notes":"Alerts/Forms/Loading/Onboarding" },
-    { "id": 34, "phase":"P2", "workstream":"onebill",   "title":"Onebill support (TBD)",                              "owner":"sami",   "handsOffTo":[],         "status":"not-started","start":"2026-08-03", "end":"2026-08-07", "linear":"",       "notes":"TBD" }
+    {
+      "id": 1,
+      "phase": "P1",
+      "workstream": "color",
+      "title": "Component color cleanup — spec ticket",
+      "owner": "sami",
+      "handsOffTo": [
+        "amanda"
+      ],
+      "status": "to-ticket",
+      "start": "2026-06-15",
+      "end": "2026-06-26",
+      "linear": "",
+      "notes": "",
+      "linksTo": []
+    },
+    {
+      "id": 2,
+      "phase": "P1",
+      "workstream": "color",
+      "title": "VQA + remap outliers",
+      "owner": "sami",
+      "handsOffTo": [
+        "amanda"
+      ],
+      "status": "in-design",
+      "start": "2026-06-15",
+      "end": "2026-07-02",
+      "linear": "",
+      "notes": "",
+      "linksTo": []
+    },
+    {
+      "id": 3,
+      "phase": "P1",
+      "workstream": "color",
+      "title": "True Black vs Off Black — decision",
+      "owner": "alexa",
+      "handsOffTo": [
+        "sami"
+      ],
+      "status": "blocked",
+      "start": "2026-06-15",
+      "end": "2026-06-19",
+      "linear": "",
+      "notes": "Pending",
+      "linksTo": []
+    },
+    {
+      "id": 4,
+      "phase": "P1",
+      "workstream": "color",
+      "title": "Purple ramp — decision",
+      "owner": "alexa",
+      "handsOffTo": [
+        "sami"
+      ],
+      "status": "blocked",
+      "start": "2026-06-15",
+      "end": "2026-06-19",
+      "linear": "",
+      "notes": "Pending",
+      "linksTo": []
+    },
+    {
+      "id": 7,
+      "phase": "P1",
+      "workstream": "icons",
+      "title": "Material chevron/back/close — decision",
+      "owner": "alexa",
+      "handsOffTo": [
+        "sami"
+      ],
+      "status": "blocked",
+      "start": "2026-06-15",
+      "end": "2026-06-19",
+      "linear": "",
+      "notes": "Pending",
+      "linksTo": []
+    },
+    {
+      "id": 8,
+      "phase": "P1",
+      "workstream": "component",
+      "title": "Component Update in Spec in Figma to Handoff to Eng",
+      "owner": "sami",
+      "handsOffTo": [
+        "amanda"
+      ],
+      "status": "in-design",
+      "start": "2026-07-06",
+      "end": "2026-07-11",
+      "linear": "",
+      "notes": "",
+      "linksTo": [
+        22
+      ]
+    },
+    {
+      "id": 12,
+      "phase": "P1",
+      "workstream": "brand",
+      "title": "Gradient Illo: Container Spec",
+      "owner": "sami",
+      "handsOffTo": [
+        "emily"
+      ],
+      "status": "in-design",
+      "start": "2026-06-15",
+      "end": "2026-06-19",
+      "linear": "",
+      "notes": "Kickoff of handoff chain",
+      "linksTo": [
+        31
+      ]
+    },
+    {
+      "id": 13,
+      "phase": "P1",
+      "workstream": "type",
+      "title": "Line-height / padding — decision",
+      "owner": "alexa",
+      "handsOffTo": [
+        "sami"
+      ],
+      "status": "blocked",
+      "start": "2026-06-15",
+      "end": "2026-06-19",
+      "linear": "",
+      "notes": "Pending",
+      "linksTo": [
+        15
+      ]
+    },
+    {
+      "id": 15,
+      "phase": "P1",
+      "workstream": "type",
+      "title": "Type Token Remap + Cleanup",
+      "owner": "sami",
+      "handsOffTo": [
+        "amanda"
+      ],
+      "status": "in-design",
+      "start": "2026-06-29",
+      "end": "2026-07-04",
+      "linear": "",
+      "notes": "Label token cleanup — spec",
+      "linksTo": []
+    },
+    {
+      "id": 16,
+      "phase": "P1",
+      "workstream": "color",
+      "title": "Primitive color remap",
+      "owner": "amanda",
+      "handsOffTo": [],
+      "status": "done",
+      "start": "2026-06-15",
+      "end": "2026-06-19",
+      "linear": "DS-179",
+      "notes": "",
+      "linksTo": []
+    },
+    {
+      "id": 17,
+      "phase": "P1",
+      "workstream": "color",
+      "title": "Semantic color remap",
+      "owner": "amanda",
+      "handsOffTo": [],
+      "status": "done",
+      "start": "2026-06-15",
+      "end": "2026-06-19",
+      "linear": "DS-175",
+      "notes": "",
+      "linksTo": []
+    },
+    {
+      "id": 18,
+      "phase": "P1",
+      "workstream": "color",
+      "title": "VQA cleanup color tokens",
+      "owner": "amanda",
+      "handsOffTo": [],
+      "status": "in-development",
+      "start": "2026-06-22",
+      "end": "2026-07-10",
+      "linear": "",
+      "notes": "",
+      "linksTo": []
+    },
+    {
+      "id": 22,
+      "phase": "P1",
+      "workstream": "component",
+      "title": "Component Updates in Code",
+      "owner": "amanda",
+      "handsOffTo": [],
+      "status": "to-ticket",
+      "start": "2026-07-13",
+      "end": "2026-07-18",
+      "linear": "",
+      "notes": "",
+      "linksTo": []
+    },
+    {
+      "id": 24,
+      "phase": "P1",
+      "workstream": "brand",
+      "title": "Remove gradient backgrounds",
+      "owner": "amanda",
+      "handsOffTo": [],
+      "status": "done",
+      "start": "2026-06-15",
+      "end": "2026-06-19",
+      "linear": "DS-182",
+      "notes": "",
+      "linksTo": []
+    },
+    {
+      "id": 25,
+      "phase": "P1",
+      "workstream": "brand",
+      "title": "Gradient Illo: Update in Code",
+      "owner": "amanda",
+      "handsOffTo": [],
+      "status": "to-ticket",
+      "start": "2026-07-06",
+      "end": "2026-07-11",
+      "linear": "",
+      "notes": "After Emily export",
+      "linksTo": []
+    },
+    {
+      "id": 26,
+      "phase": "P1",
+      "workstream": "type",
+      "title": "Type Token Remap + Cleanup in Code",
+      "owner": "amanda",
+      "handsOffTo": [],
+      "status": "to-ticket",
+      "start": "2026-07-03",
+      "end": "2026-07-08",
+      "linear": "",
+      "notes": "",
+      "linksTo": []
+    },
+    {
+      "id": 27,
+      "phase": "P1",
+      "workstream": "type",
+      "title": "Left alignment to text stacks",
+      "owner": "amanda",
+      "handsOffTo": [],
+      "status": "done",
+      "start": "2026-06-15",
+      "end": "2026-06-19",
+      "linear": "",
+      "notes": "",
+      "linksTo": []
+    },
+    {
+      "id": 28,
+      "phase": "P1",
+      "workstream": "spacing",
+      "title": "Margins + gaps",
+      "owner": "amanda",
+      "handsOffTo": [],
+      "status": "in-development",
+      "start": "2026-06-29",
+      "end": "2026-07-04",
+      "linear": "",
+      "notes": "",
+      "linksTo": []
+    },
+    {
+      "id": 29,
+      "phase": "P2",
+      "workstream": "spacing",
+      "title": "Component-level spacing tokens (semantic)",
+      "owner": "amanda",
+      "handsOffTo": [],
+      "status": "backlog",
+      "start": "2026-07-27",
+      "end": "2026-08-07",
+      "linear": "",
+      "notes": "",
+      "linksTo": []
+    },
+    {
+      "id": 30,
+      "phase": "P2",
+      "workstream": "shape",
+      "title": "Radii tokens",
+      "owner": "amanda",
+      "handsOffTo": [],
+      "status": "backlog",
+      "start": "2026-07-27",
+      "end": "2026-08-07",
+      "linear": "",
+      "notes": "",
+      "linksTo": []
+    },
+    {
+      "id": 31,
+      "phase": "P1",
+      "workstream": "brand",
+      "title": "Gradient illustrations — resize + export",
+      "owner": "emily",
+      "handsOffTo": [
+        "amanda"
+      ],
+      "status": "to-ticket",
+      "start": "2026-06-22",
+      "end": "2026-06-26",
+      "linear": "",
+      "notes": "From Sami container spec",
+      "linksTo": [
+        25
+      ]
+    },
+    {
+      "id": 32,
+      "phase": "P1",
+      "workstream": "type",
+      "title": "Font licensing",
+      "owner": "alexa",
+      "handsOffTo": [
+        "isaac"
+      ],
+      "status": "blocked",
+      "start": "2026-06-15",
+      "end": "2026-06-19",
+      "linear": "",
+      "notes": "Blocks type remap",
+      "linksTo": []
+    },
+    {
+      "id": 33,
+      "phase": "P2",
+      "workstream": "templates",
+      "title": "Core screen template consolidation",
+      "owner": "sami",
+      "handsOffTo": [
+        "amanda"
+      ],
+      "status": "backlog",
+      "start": "2026-07-27",
+      "end": "2026-08-07",
+      "linear": "",
+      "notes": "Alerts/Forms/Loading/Onboarding",
+      "linksTo": []
+    },
+    {
+      "id": 34,
+      "phase": "P2",
+      "workstream": "onebill",
+      "title": "Onebill support (TBD)",
+      "owner": "sami",
+      "handsOffTo": [],
+      "status": "backlog",
+      "start": "2026-08-03",
+      "end": "2026-08-07",
+      "linear": "",
+      "notes": "TBD",
+      "linksTo": []
+    },
+    {
+      "id": 35,
+      "phase": "P1",
+      "workstream": "color",
+      "title": "Color Migrate in Code",
+      "owner": "amanda",
+      "handsOffTo": [],
+      "status": "backlog",
+      "start": "2026-06-15",
+      "end": "2026-06-15",
+      "linear": "",
+      "notes": "",
+      "linksTo": []
+    },
+    {
+      "id": 36,
+      "phase": "P1",
+      "workstream": "color",
+      "title": "Add tickets for finalized decisions",
+      "owner": "sami",
+      "handsOffTo": [],
+      "status": "to-ticket",
+      "start": "2026-06-15",
+      "end": "2026-06-22",
+      "linear": "",
+      "notes": "",
+      "linksTo": []
+    }
   ]
 }
