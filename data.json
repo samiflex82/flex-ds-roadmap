@@ -41,8 +41,8 @@
         "id": "deploy",
         "label": "🚀 Deploy",
         "date": "2026-07-22",
-        "color": "#5FD29A",
-        "text": "#5FD29A"
+        "color": "#69a762",
+        "text": "#68ba5e"
       },
       {
         "id": "m-1656518033",
@@ -55,8 +55,8 @@
         "id": "m-1656518034",
         "label": "🚀 Deploy",
         "date": "2026-08-19",
-        "color": "#5FD29A",
-        "text": "#5FD29A"
+        "color": "#69a762",
+        "text": "#68ba5e"
       }
     ],
     "todayMarker": {
@@ -100,7 +100,7 @@
     {
       "id": "backlog",
       "label": "Backlog",
-      "bg": "#242424",
+      "bg": "#1a1a1a",
       "fg": "#AEB2BA",
       "textMode": "auto"
     },
@@ -114,7 +114,7 @@
     {
       "id": "next-up",
       "label": "Next up",
-      "bg": "#323948",
+      "bg": "#2b2e36",
       "fg": "#A9C2F0",
       "textMode": "auto"
     },
@@ -141,7 +141,7 @@
     },
     {
       "id": "in-review",
-      "label": "In review",
+      "label": "In Review",
       "bg": "#440f48",
       "fg": "#FFE07A",
       "textMode": "auto"
@@ -149,7 +149,7 @@
     {
       "id": "done",
       "label": "Done",
-      "bg": "#093b02",
+      "bg": "#68ba5e",
       "fg": "#6FE0A0",
       "textMode": "auto"
     }
@@ -714,7 +714,7 @@
       "owner": "amanda",
       "status": "next-up",
       "start": "2026-07-13",
-      "end": "2026-07-17",
+      "end": "2026-07-24",
       "linear": "",
       "notes": "",
       "blocking": [],
@@ -846,7 +846,7 @@
       "owner": "sami",
       "status": "backlog",
       "start": "2026-08-05",
-      "end": "2026-08-14",
+      "end": "2026-08-21",
       "linear": "",
       "notes": "",
       "blocking": [],
