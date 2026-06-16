@@ -198,7 +198,7 @@ function renderWeekNotes(weeks) {
 
   const label = document.createElement('div');
   label.className = 'notes-label';
-  label.textContent = '📝 Notes';
+  label.textContent = '';
   wrap.appendChild(label);
 
   const track = document.createElement('div');

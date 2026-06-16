@@ -69,31 +69,31 @@
       "id": "sami",
       "name": "Sami W",
       "role": "DS Designer + Ops",
-      "color": "#2815a2"
+      "color": "#88e5f2"
     },
     {
       "id": "amanda",
       "name": "Amanda C",
       "role": "Lead DS Eng",
-      "color": "#5c1376"
+      "color": "#8d4ca4"
     },
     {
       "id": "emily",
       "name": "Emily C",
       "role": "Production Designer",
-      "color": "#E07B39"
+      "color": "#e2b679"
     },
     {
       "id": "alexa",
       "name": "Alexa D",
       "role": "DS Design Manager",
-      "color": "#C14D74"
+      "color": "#c87e97"
     },
     {
       "id": "isaac",
       "name": "Isaac W",
       "role": "DS Eng Manager",
-      "color": "#3B82C4"
+      "color": "#69a762"
     }
   ],
   "statuses": [
@@ -107,7 +107,7 @@
     {
       "id": "blocked",
       "label": "Blocked",
-      "bg": "#321410",
+      "bg": "#C13714",
       "fg": "#F6A88F",
       "textMode": "auto"
     },
@@ -121,35 +121,35 @@
     {
       "id": "to-ticket",
       "label": "In Production",
-      "bg": "#c69a5d",
+      "bg": "#e2b679",
       "fg": "#C4B5FD",
       "textMode": "auto"
     },
     {
       "id": "in-design",
       "label": "In Design",
-      "bg": "#8dbcbf",
+      "bg": "#88e5f2",
       "fg": "#CBB6FF",
       "textMode": "auto"
     },
     {
       "id": "in-development",
       "label": "In Development",
-      "bg": "#8d4ca4",
+      "bg": "#B28CF4",
       "fg": "#5FD29A",
       "textMode": "auto"
     },
     {
       "id": "in-review",
       "label": "In Review",
-      "bg": "#440f48",
+      "bg": "#381461",
       "fg": "#FFE07A",
       "textMode": "auto"
     },
     {
       "id": "done",
       "label": "Done",
-      "bg": "#68ba5e",
+      "bg": "#1f3814",
       "fg": "#6FE0A0",
       "textMode": "auto"
     }
@@ -704,7 +704,7 @@
       "notes": "",
       "blocking": [],
       "handsOffTo": [],
-      "track": 3
+      "track": 2
     },
     {
       "id": 46,
@@ -850,6 +850,21 @@
       "linear": "",
       "notes": "",
       "blocking": [],
+      "handsOffTo": []
+    },
+    {
+      "id": 56,
+      "title": "Create ticket updates for blocked final decisions",
+      "phase": "P1",
+      "workstream": "new-workstream",
+      "owner": "sami",
+      "status": "next-up",
+      "start": "2026-06-22",
+      "end": "2026-06-26",
+      "linear": "",
+      "notes": "",
+      "blocking": [],
+      "track": 3,
       "handsOffTo": []
     }
   ]
