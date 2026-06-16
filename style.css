@@ -548,10 +548,12 @@ input, select, textarea { color-scheme: dark; }  /* dark native date pickers + l
 .settings-row input.icon-input { flex: 0 0 44px; width: 44px; text-align: center; font-size: 15px; }
 /* color field = swatch + editable hex */
 .color-field { display: inline-flex; align-items: center; gap: 5px; flex-shrink: 0; }
-.color-field input[type="color"] {
-  width: 28px; height: 28px; border: 1px solid var(--border); border-radius: 5px;
-  background: var(--surface-3); padding: 2px; cursor: pointer; flex-shrink: 0;
+.color-preview {
+  width: 28px; height: 28px; flex-shrink: 0;
+  border: 1px solid var(--border); border-radius: 5px;
+  cursor: pointer; display: inline-block;
 }
+.color-preview:hover { border-color: var(--border-strong); }
 .hex-input {
   width: 78px; flex: 0 0 78px;
   font-family: ui-monospace, SFMono-Regular, Menlo, monospace;

@@ -693,17 +693,25 @@ function renderSettingsLists() {
 // after editing any color: persist, re-render the board, refresh the in-use palette
 function afterColorChange() { save(); render(); renderPalette(); }
 
-// A reusable [swatch + editable hex] control, two-way synced.
+// A reusable [color-preview chip + editable hex] control.
+// No native color picker — type or paste a hex directly.
 function colorField(getHex, setHex) {
   const wrap = document.createElement('span');
   wrap.className = 'color-field';
-  const sw = document.createElement('input');
-  sw.type = 'color'; sw.value = getHex() || '#888888';
+  // preview chip: click to focus/select the hex input
+  const preview = document.createElement('span');
+  preview.className = 'color-preview';
+  preview.style.background = getHex() || '#888888';
+  preview.title = 'Click to edit hex';
   const hex = document.createElement('input');
   hex.type = 'text'; hex.className = 'hex-input'; hex.value = getHex() || ''; hex.maxLength = 7; hex.spellcheck = false;
-  sw.oninput  = () => { hex.value = sw.value; setHex(sw.value); };
-  hex.oninput = () => { const v = hex.value.trim(); if (/^#[0-9a-fA-F]{6}$/.test(v)) { sw.value = v; setHex(v); } };
-  wrap.append(sw, hex);
+  hex.placeholder = '#000000';
+  preview.onclick = () => { hex.focus(); hex.select(); };
+  hex.oninput = () => {
+    const v = hex.value.trim();
+    if (/^#[0-9a-fA-F]{6}$/.test(v)) { preview.style.background = v; setHex(v); }
+  };
+  wrap.append(preview, hex);
   return wrap;
 }
 

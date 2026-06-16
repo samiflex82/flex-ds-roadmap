@@ -34,7 +34,7 @@
         "id": "cc",
         "label": "◆ Code Complete",
         "date": "2026-07-17",
-        "color": "#7978b0",
+        "color": "#6e6bff",
         "text": "#6e6bff"
       },
       {
@@ -45,15 +45,15 @@
         "text": "#5FD29A"
       },
       {
-        "id": "cc2",
-        "label": "◆ P2 Code Complete",
+        "id": "m-1656518033",
+        "label": "◆ Code Complete",
         "date": "2026-08-14",
-        "color": "#7978b0",
+        "color": "#6e6bff",
         "text": "#6e6bff"
       },
       {
-        "id": "deploy2",
-        "label": "🚀 P2 Deploy",
+        "id": "m-1656518034",
+        "label": "🚀 Deploy",
         "date": "2026-08-19",
         "color": "#5FD29A",
         "text": "#5FD29A"
@@ -475,12 +475,12 @@
       "owner": "sami",
       "handsOffTo": [],
       "status": "backlog",
-      "start": "2026-08-03",
-      "end": "2026-08-07",
+      "start": "2026-07-27",
+      "end": "2026-07-31",
       "linear": "",
       "notes": "",
       "blocking": [],
-      "track": 1
+      "track": 3
     },
     {
       "id": 30,
@@ -490,12 +490,12 @@
       "owner": "sami",
       "handsOffTo": [],
       "status": "backlog",
-      "start": "2026-08-03",
-      "end": "2026-08-07",
+      "start": "2026-07-27",
+      "end": "2026-07-31",
       "linear": "",
       "notes": "",
       "blocking": [],
-      "track": 3
+      "track": 2
     },
     {
       "id": 31,
@@ -539,12 +539,12 @@
         "amanda"
       ],
       "status": "backlog",
-      "start": "2026-08-03",
-      "end": "2026-08-07",
+      "start": "2026-07-27",
+      "end": "2026-08-10",
       "linear": "",
       "notes": "Alerts/Forms/Loading/Onboarding",
       "blocking": [],
-      "track": 0
+      "track": 1
     },
     {
       "id": 34,
@@ -613,12 +613,12 @@
       "owner": "sami",
       "handsOffTo": [],
       "status": "backlog",
-      "start": "2026-08-03",
-      "end": "2026-08-07",
+      "start": "2026-08-24",
+      "end": "2026-08-28",
       "linear": "",
       "notes": "",
       "blocking": [],
-      "track": 2
+      "track": 1
     },
     {
       "id": 40,
@@ -822,6 +822,34 @@
       "notes": "",
       "blocking": [],
       "track": 0,
+      "handsOffTo": []
+    },
+    {
+      "id": 54,
+      "title": "Phase 2 Build",
+      "phase": "P1",
+      "workstream": "new-workstream",
+      "owner": "amanda",
+      "status": "backlog",
+      "start": "2026-08-03",
+      "end": "2026-08-14",
+      "linear": "",
+      "notes": "",
+      "blocking": [],
+      "handsOffTo": []
+    },
+    {
+      "id": 55,
+      "title": "Phase 2 VQA",
+      "phase": "P1",
+      "workstream": "color",
+      "owner": "sami",
+      "status": "backlog",
+      "start": "2026-08-05",
+      "end": "2026-08-14",
+      "linear": "",
+      "notes": "",
+      "blocking": [],
       "handsOffTo": []
     }
   ]
