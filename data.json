@@ -231,13 +231,13 @@
       "handsOffTo": [
         "amanda"
       ],
-      "status": "next-up",
+      "status": "in-design",
       "start": "2026-06-17",
       "end": "2026-06-26",
       "linear": "",
       "notes": "",
       "blocking": [],
-      "track": 4
+      "track": 5
     },
     {
       "id": 3,
@@ -318,7 +318,8 @@
       "end": "2026-06-18",
       "linear": "",
       "notes": "Kickoff of handoff chain",
-      "blocking": []
+      "blocking": [],
+      "track": 3
     },
     {
       "id": 13,
@@ -562,20 +563,6 @@
       "track": 0
     },
     {
-      "id": 36,
-      "phase": "P1",
-      "workstream": "color",
-      "title": "Add tickets for finalized blocked decisions",
-      "owner": "sami",
-      "handsOffTo": [],
-      "status": "next-up",
-      "start": "2026-06-22",
-      "end": "2026-06-26",
-      "linear": "",
-      "notes": "",
-      "blocking": []
-    },
-    {
       "id": 37,
       "phase": "P1",
       "workstream": "color",
@@ -603,7 +590,7 @@
       "linear": "",
       "notes": "",
       "blocking": [],
-      "track": 1
+      "track": 2
     },
     {
       "id": 39,
@@ -684,12 +671,13 @@
       "workstream": "new-workstream",
       "owner": "sami",
       "status": "in-design",
-      "start": "2026-06-15",
+      "start": "2026-06-16",
       "end": "2026-06-18",
       "linear": "",
       "notes": "",
       "blocking": [],
-      "handsOffTo": []
+      "handsOffTo": [],
+      "track": 2
     },
     {
       "id": 45,
@@ -704,7 +692,7 @@
       "notes": "",
       "blocking": [],
       "handsOffTo": [],
-      "track": 2
+      "track": 4
     },
     {
       "id": 46,
@@ -865,6 +853,21 @@
       "notes": "",
       "blocking": [],
       "track": 3,
+      "handsOffTo": []
+    },
+    {
+      "id": 57,
+      "title": "Color Token Figma Updates",
+      "phase": "P1",
+      "workstream": "color",
+      "owner": "sami",
+      "status": "in-design",
+      "start": "2026-06-17",
+      "end": "2026-06-24",
+      "linear": "",
+      "notes": "",
+      "blocking": [],
+      "track": 1,
       "handsOffTo": []
     }
   ]
