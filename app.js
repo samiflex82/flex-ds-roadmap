@@ -120,6 +120,13 @@ function escapeHtml(s) {
     ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 }
 
+// Color helpers for the editable column markers
+const MARKER_DEFAULTS = { today: '#6FB6F0', codeComplete: '#F2A24E', deploy: '#5FD29A' };
+function markerColor(key) { return (DATA.meta?.markerColors || {})[key] || MARKER_DEFAULTS[key]; }
+function hexToRgb(h) { h = h.replace('#',''); return [parseInt(h.substr(0,2),16), parseInt(h.substr(2,2),16), parseInt(h.substr(4,2),16)]; }
+function mix(hex, withHex, t) { const a = hexToRgb(hex), b = hexToRgb(withHex); const m = a.map((v,i)=>Math.round(v+(b[i]-v)*t)); return `rgb(${m[0]},${m[1]},${m[2]})`; }
+function hexToRgba(hex, al) { const [r,g,b] = hexToRgb(hex); return `rgba(${r},${g},${b},${al})`; }
+
 // Build a Linear issue URL from an ID (DS-179) or pass through a full URL.
 function linearUrl(v) {
   if (!v) return null;
@@ -164,20 +171,28 @@ function renderWeekHeaders(weeks) {
   const container = document.getElementById('week-headers');
   container.innerHTML = '';
 
+  const fmt = d => d.toLocaleDateString('en-US', { month:'short', day:'numeric' });
   weeks.forEach(w => {
     const div = document.createElement('div');
     div.className = 'week-col';
     const fri = addDays(w, 4);
+    const range = `${fmt(w)} → ${fmt(fri)}`;
     const isCC  = w.getTime() === ccWeek;
     const isDep = w.getTime() === depWeek;
     const isToday = w.getTime() === todayWeek;
-    if (isToday) div.classList.add('target-today');
-    if (isCC)  div.classList.add('target-cc');
-    if (isDep) div.classList.add('target-deploy');
-    const badge = isCC ? '◆ Code Complete' : isDep ? '🚀 Deploy' : isToday ? '● This week' : '';
+    // precedence: code-complete > deploy > today
+    let accent = null, badge = '';
+    if (isCC)        { accent = markerColor('codeComplete'); badge = '◆ Code Complete'; }
+    else if (isDep)  { accent = markerColor('deploy');       badge = '🚀 Deploy'; }
+    else if (isToday){ accent = markerColor('today');        badge = '● This week'; }
+    if (accent) {
+      div.classList.add('is-marker');
+      div.style.background = mix(accent, '#141414', 0.85);
+      div.style.color = accent;
+    }
     div.innerHTML = `
-      <span class="week-label">${w.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>
-      <span class="week-dates">${(isDep||isCC||isToday) ? badge : '→ ' + fri.toLocaleDateString('en-US',{month:'short',day:'numeric'})}</span>
+      <span class="week-label">${range}</span>
+      ${badge ? `<span class="week-badge">${badge}</span>` : ''}
     `;
     container.appendChild(div);
   });
@@ -247,7 +262,7 @@ function renderLegend() {
     span.className = 'legend-swatch';
     span.textContent = s.label;
     span.style.background = s.bg;
-    span.style.color = s.fg || readableFg(s.bg);
+    span.style.color = 'var(--ink)';
     c.appendChild(span);
   });
 }
@@ -282,15 +297,20 @@ function renderSwimlanes(weeks) {
     weeks.forEach(w => {
       const col = document.createElement('div');
       col.className = 'grid-col';
-      if (w.getTime() === todayWeek) col.classList.add('target-today');
-      if (w.getTime() === ccWeek)  col.classList.add('target-cc');
-      if (w.getTime() === depWeek) col.classList.add('target-deploy');
+      let acc = null;
+      if (w.getTime() === ccWeek)       acc = markerColor('codeComplete');
+      else if (w.getTime() === depWeek) acc = markerColor('deploy');
+      else if (w.getTime() === todayWeek) acc = markerColor('today');
+      if (acc) col.style.background = hexToRgba(acc, 0.06);
       grid.appendChild(col);
     });
 
-    // Lane packing: assign each item to the first track with no date overlap.
+    // Lane packing: auto-assign a track, but an explicit item.track (set by dragging
+    // a card up/down) wins. Untouched items still auto-stack to avoid overlap.
     const tracks = packTracks(personItems);
-    const laneHeight = LANE_PAD * 2 + tracks.count * CARD_H + (tracks.count - 1) * V_GAP;
+    const trackOf = item => (item.track != null ? item.track : tracks.byId[item.id]);
+    const maxTrack = Math.max(0, ...personItems.map(trackOf));
+    const laneHeight = LANE_PAD * 2 + (maxTrack + 1) * CARD_H + maxTrack * V_GAP;
     lane.style.minHeight = laneHeight + 'px';
 
     // Cards layer
@@ -298,7 +318,7 @@ function renderSwimlanes(weeks) {
     cardsLayer.className = 'cards-layer';
 
     personItems.forEach(item => {
-      const card = buildCard(item, weeks, tracks.byId[item.id]);
+      const card = buildCard(item, weeks, trackOf(item));
       if (card) cardsLayer.appendChild(card);
     });
     grid.appendChild(cardsLayer);
@@ -344,7 +364,8 @@ function buildCard(item, weeks, track) {
   card.style.top    = (LANE_PAD + (track || 0) * (CARD_H + V_GAP)) + 'px';
   card.style.height = CARD_H + 'px';
   // colors are data-driven (statuses are editable)
-  if (st) { card.style.background = st.bg; card.style.color = st.fg || readableFg(st.bg); }
+  if (st) { card.style.background = st.bg; }
+  card.style.color = 'var(--ink)';   // uniform cool off-white for title + status text
   card.style.borderColor = 'rgba(255,255,255,0.1)';
   if (ws) { card.style.borderLeft = `3px solid ${ws.color}`; }
 
@@ -420,8 +441,15 @@ function setupDrag(card, item, weeks) {
       const under = document.elementFromPoint(e.clientX, e.clientY);
       card.style.pointerEvents = '';
       const lane = under && under.closest('.swimlane');
-      if (lane && lane.dataset.owner && lane.dataset.owner !== item.owner) {
-        item.owner = lane.dataset.owner;
+      if (lane && lane.dataset.owner) {
+        if (lane.dataset.owner !== item.owner) item.owner = lane.dataset.owner;
+        // manual vertical order: snap to the row under the cursor in that lane
+        const grid = lane.querySelector('.swimlane-grid');
+        if (grid) {
+          const gr = grid.getBoundingClientRect();
+          const row = Math.round((e.clientY - gr.top - LANE_PAD) / (CARD_H + V_GAP));
+          item.track = Math.max(0, row);
+        }
       }
 
       save();
@@ -586,6 +614,9 @@ settingsOverlay.onclick = e => { if (e.target === settingsOverlay) closeSettings
 function openSettings() {
   document.getElementById('s-cc-date').value     = DATA.meta.codeCompleteDate || '';
   document.getElementById('s-deploy-date').value = DATA.meta.deployDate || '';
+  document.getElementById('m-today').value  = markerColor('today');
+  document.getElementById('m-cc').value     = markerColor('codeComplete');
+  document.getElementById('m-deploy').value = markerColor('deploy');
   renderSettingsLists();
   settingsOverlay.classList.remove('hidden');
 }
@@ -598,6 +629,16 @@ document.getElementById('s-cc-date').onchange = e => {
 document.getElementById('s-deploy-date').onchange = e => {
   if (e.target.value) { DATA.meta.deployDate = e.target.value; save(); render(); }
 };
+
+// column marker colors commit immediately
+function setMarker(key, val) {
+  DATA.meta.markerColors = DATA.meta.markerColors || { ...MARKER_DEFAULTS };
+  DATA.meta.markerColors[key] = val;
+  save(); render();
+}
+document.getElementById('m-today').oninput  = e => setMarker('today', e.target.value);
+document.getElementById('m-cc').oninput     = e => setMarker('codeComplete', e.target.value);
+document.getElementById('m-deploy').oninput = e => setMarker('deploy', e.target.value);
 
 // count of items referencing a given list entry (for delete-safety)
 function usageCount(listKey, id) {
@@ -885,7 +926,12 @@ function migrate(data) {
     if (SEED?.meta?.timelineEnd && !data.meta.timelineEnd) data.meta.timelineEnd = SEED.meta.timelineEnd;
   }
 
-  data.meta.seedVersion = Math.max(v, SEED?.meta?.seedVersion ?? v, 5);
+  // v<6: default the editable column-marker colors (non-destructive — only if absent)
+  if (v < 6 && !data.meta.markerColors) {
+    data.meta.markerColors = { ...(SEED?.meta?.markerColors || MARKER_DEFAULTS) };
+  }
+
+  data.meta.seedVersion = Math.max(v, SEED?.meta?.seedVersion ?? v, 6);
 }
 
 // ─── Initial scroll to the current week (once) ────────────────────────────────

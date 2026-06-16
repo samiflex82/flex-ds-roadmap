@@ -1,20 +1,24 @@
 {
   "meta": {
     "title": "Flex DS — Dark Matter Roadmap",
-    "seedVersion": 5,
+    "seedVersion": 6,
     "codeCompleteDate": "2026-07-24",
     "deployDate": "2026-07-29",
     "startDate": "2026-06-15",
     "timelineStart": "2026-06-01",
     "linearOrg": "get-flex",
-    "timelineEnd": "2026-12-31"
+    "markerColors": {
+      "today": "#6FB6F0",
+      "codeComplete": "#F2A24E",
+      "deploy": "#5FD29A"
+    }
   },
   "people": [
     {
       "id": "sami",
       "name": "Sami W",
       "role": "DS Designer + Ops",
-      "color": "#7C6FCD"
+      "color": "#2815a2"
     },
     {
       "id": "amanda",
@@ -69,19 +73,19 @@
     {
       "id": "to-ticket",
       "label": "To ticket",
-      "bg": "#0F3030",
-      "fg": "#6FD8CE"
+      "bg": "#0c325a",
+      "fg": "#C4B5FD"
     },
     {
       "id": "in-design",
       "label": "In design",
-      "bg": "#331526",
-      "fg": "#F2A6C9"
+      "bg": "#131b58",
+      "fg": "#CBB6FF"
     },
     {
       "id": "in-development",
       "label": "In development",
-      "bg": "#11301F",
+      "bg": "#83531b",
       "fg": "#5FD29A"
     },
     {
@@ -93,7 +97,7 @@
     {
       "id": "done",
       "label": "Done",
-      "bg": "#123524",
+      "bg": "#01190d",
       "fg": "#6FE0A0"
     }
   ],
@@ -109,6 +113,10 @@
     {
       "id": "P3",
       "label": "P3"
+    },
+    {
+      "id": "new-phase",
+      "label": "Ongoing"
     }
   ],
   "workstreams": [
@@ -144,27 +152,15 @@
     },
     {
       "id": "spacing",
-      "label": "Spacing",
+      "label": "Spacing / Radii",
       "color": "#8D9199",
       "icon": "↔️"
     },
     {
-      "id": "shape",
-      "label": "Shape / Radii",
-      "color": "#106C41",
-      "icon": "⬛"
-    },
-    {
       "id": "templates",
-      "label": "Templates",
+      "label": "DS Intake Request",
       "color": "#94420C",
       "icon": "🗂️"
-    },
-    {
-      "id": "onebill",
-      "label": "OneBill",
-      "color": "#6B5E82",
-      "icon": "🧾"
     }
   ],
   "items": [
@@ -178,8 +174,8 @@
         "amanda"
       ],
       "status": "in-design",
-      "start": "2026-06-15",
-      "end": "2026-07-02",
+      "start": "2026-06-18",
+      "end": "2026-07-03",
       "linear": "",
       "notes": "",
       "blocking": []
@@ -258,8 +254,8 @@
         "emily"
       ],
       "status": "in-design",
-      "start": "2026-06-15",
-      "end": "2026-06-19",
+      "start": "2026-06-17",
+      "end": "2026-06-18",
       "linear": "",
       "notes": "Kickoff of handoff chain",
       "blocking": []
@@ -332,7 +328,7 @@
       "owner": "amanda",
       "handsOffTo": [],
       "status": "in-development",
-      "start": "2026-06-22",
+      "start": "2026-06-26",
       "end": "2026-07-08",
       "linear": "",
       "notes": "",
@@ -388,8 +384,8 @@
       "owner": "amanda",
       "handsOffTo": [],
       "status": "to-ticket",
-      "start": "2026-07-03",
-      "end": "2026-07-08",
+      "start": "2026-06-29",
+      "end": "2026-07-02",
       "linear": "",
       "notes": "",
       "blocking": []
@@ -402,8 +398,8 @@
       "owner": "amanda",
       "handsOffTo": [],
       "status": "next-up",
-      "start": "2026-07-03",
-      "end": "2026-07-07",
+      "start": "2026-07-07",
+      "end": "2026-07-11",
       "linear": "",
       "notes": "",
       "blocking": []
@@ -417,7 +413,7 @@
       "handsOffTo": [],
       "status": "in-development",
       "start": "2026-06-29",
-      "end": "2026-07-04",
+      "end": "2026-07-02",
       "linear": "",
       "notes": "",
       "blocking": []
@@ -439,7 +435,7 @@
     {
       "id": 30,
       "phase": "P2",
-      "workstream": "shape",
+      "workstream": "color",
       "title": "Radii tokens",
       "owner": "amanda",
       "handsOffTo": [],
@@ -501,7 +497,7 @@
     {
       "id": 34,
       "phase": "P2",
-      "workstream": "onebill",
+      "workstream": "color",
       "title": "Onebill support (TBD)",
       "owner": "sami",
       "handsOffTo": [],
@@ -520,8 +516,8 @@
       "owner": "sami",
       "handsOffTo": [],
       "status": "to-ticket",
-      "start": "2026-06-15",
-      "end": "2026-06-19",
+      "start": "2026-06-22",
+      "end": "2026-06-26",
       "linear": "",
       "notes": "",
       "blocking": []
@@ -595,6 +591,48 @@
       "linear": "",
       "notes": "",
       "blocking": []
+    },
+    {
+      "id": 42,
+      "title": "Color Token Remapping for Eng",
+      "phase": "P1",
+      "workstream": "color",
+      "owner": "sami",
+      "status": "done",
+      "start": "2026-06-08",
+      "end": "2026-06-12",
+      "linear": "",
+      "notes": "",
+      "blocking": [],
+      "handsOffTo": []
+    },
+    {
+      "id": 43,
+      "title": "Selector Card Disabled + text.disabled",
+      "phase": "new-phase",
+      "workstream": "templates",
+      "owner": "sami",
+      "status": "in-design",
+      "start": "2026-06-15",
+      "end": "2026-06-18",
+      "linear": "",
+      "notes": "",
+      "blocking": [],
+      "handsOffTo": []
+    },
+    {
+      "id": 44,
+      "title": "Redesign figma support",
+      "phase": "P1",
+      "workstream": "templates",
+      "owner": "sami",
+      "status": "in-design",
+      "start": "2026-06-15",
+      "end": "2026-06-18",
+      "linear": "",
+      "notes": "",
+      "blocking": [],
+      "handsOffTo": []
     }
   ]
 }
