@@ -69,13 +69,13 @@
       "id": "sami",
       "name": "Sami W",
       "role": "DS Designer + Ops",
-      "color": "#A1EEE6"
+      "color": "#88e5f2"
     },
     {
       "id": "amanda",
       "name": "Amanda C",
       "role": "Lead DS Eng",
-      "color": "#381461"
+      "color": "#B28CF4"
     },
     {
       "id": "emily",
@@ -128,7 +128,7 @@
     {
       "id": "in-design",
       "label": "In Design",
-      "bg": "#A1EEE6",
+      "bg": "#88e5f2",
       "fg": "#CBB6FF",
       "textMode": "auto"
     },
@@ -237,7 +237,7 @@
       "linear": "",
       "notes": "",
       "blocking": [],
-      "track": 5
+      "track": 6
     },
     {
       "id": 3,
@@ -253,7 +253,8 @@
       "end": "2026-06-18",
       "linear": "",
       "notes": "Pending",
-      "blocking": []
+      "blocking": [],
+      "track": 1
     },
     {
       "id": 4,
@@ -269,7 +270,8 @@
       "end": "2026-06-18",
       "linear": "",
       "notes": "Pending",
-      "blocking": []
+      "blocking": [],
+      "track": 2
     },
     {
       "id": 7,
@@ -285,7 +287,8 @@
       "end": "2026-06-18",
       "linear": "",
       "notes": "Pending",
-      "blocking": []
+      "blocking": [],
+      "track": 3
     },
     {
       "id": 8,
@@ -318,8 +321,7 @@
       "end": "2026-06-18",
       "linear": "",
       "notes": "Kickoff of handoff chain",
-      "blocking": [],
-      "track": 3
+      "blocking": []
     },
     {
       "id": 13,
@@ -335,7 +337,8 @@
       "end": "2026-06-18",
       "linear": "",
       "notes": "Pending",
-      "blocking": []
+      "blocking": [],
+      "track": 4
     },
     {
       "id": 16,
@@ -528,7 +531,8 @@
       "end": "2026-06-18",
       "linear": "",
       "notes": "Blocks type remap",
-      "blocking": []
+      "blocking": [],
+      "track": 5
     },
     {
       "id": 33,
@@ -563,6 +567,21 @@
       "track": 0
     },
     {
+      "id": 36,
+      "phase": "P1",
+      "workstream": "color",
+      "title": "Add tickets for finalized blocked decisions",
+      "owner": "sami",
+      "handsOffTo": [],
+      "status": "next-up",
+      "start": "2026-06-22",
+      "end": "2026-06-26",
+      "linear": "",
+      "notes": "",
+      "blocking": [],
+      "track": 2
+    },
+    {
       "id": 37,
       "phase": "P1",
       "workstream": "color",
@@ -590,7 +609,7 @@
       "linear": "",
       "notes": "",
       "blocking": [],
-      "track": 2
+      "track": 3
     },
     {
       "id": 39,
@@ -671,7 +690,7 @@
       "workstream": "new-workstream",
       "owner": "sami",
       "status": "in-design",
-      "start": "2026-06-16",
+      "start": "2026-06-15",
       "end": "2026-06-18",
       "linear": "",
       "notes": "",
@@ -681,18 +700,18 @@
     },
     {
       "id": 45,
-      "title": "Set up Type Ticket for Eng",
+      "title": "Figma Type Token Remap",
       "phase": "P1",
       "workstream": "type",
-      "owner": "sami",
-      "status": "next-up",
-      "start": "2026-06-22",
-      "end": "2026-06-26",
+      "owner": "alexa",
+      "status": "in-design",
+      "start": "2026-06-16",
+      "end": "2026-06-18",
       "linear": "",
       "notes": "",
       "blocking": [],
       "handsOffTo": [],
-      "track": 4
+      "track": 0
     },
     {
       "id": 46,
@@ -761,11 +780,11 @@
       "owner": "sami",
       "status": "next-up",
       "start": "2026-07-20",
-      "end": "2026-07-24",
+      "end": "2026-07-31",
       "linear": "",
       "notes": "",
       "blocking": [],
-      "track": 3,
+      "track": 4,
       "handsOffTo": []
     },
     {
@@ -852,18 +871,32 @@
       "linear": "",
       "notes": "",
       "blocking": [],
-      "track": 3,
+      "track": 5,
       "handsOffTo": []
     },
     {
       "id": 57,
-      "title": "Color Token Figma Updates",
+      "title": "Set up Figma <> Code Parity Token Plugin",
+      "phase": "P1",
+      "workstream": "color",
+      "owner": "sami",
+      "status": "backlog",
+      "start": "2026-08-24",
+      "end": "2026-09-07",
+      "linear": "",
+      "notes": "",
+      "blocking": [],
+      "handsOffTo": []
+    },
+    {
+      "id": 58,
+      "title": "Figma Color Token Set Up",
       "phase": "P1",
       "workstream": "color",
       "owner": "sami",
       "status": "in-design",
       "start": "2026-06-17",
-      "end": "2026-06-24",
+      "end": "2026-06-23",
       "linear": "",
       "notes": "",
       "blocking": [],
