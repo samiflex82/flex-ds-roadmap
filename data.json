@@ -2,29 +2,29 @@
   "meta": {
     "title": "Flex DS — Dark Matter Roadmap",
     "seedVersion": 7,
-    "codeCompleteDate": "2026-07-24",
-    "deployDate": "2026-07-29",
+    "codeCompleteDate": "2026-07-17",
+    "deployDate": "2026-07-22",
     "startDate": "2026-06-15",
     "timelineStart": "2026-06-01",
     "linearOrg": "get-flex",
-    "weekNotes": {},
     "markerColors": {
       "today": {
-        "color": "#6FB6F0",
+        "color": "#e7f070",
         "label": "● This week",
-        "text": "#6FB6F0"
+        "text": "#e7f070"
       },
       "codeComplete": {
-        "color": "#F2A24E",
+        "color": "#6e6bff",
         "label": "◆ Code Complete",
-        "text": "#F2A24E"
+        "text": "#6e6bff"
       },
       "deploy": {
         "color": "#5FD29A",
         "label": "🚀 Deploy",
         "text": "#5FD29A"
       }
-    }
+    },
+    "weekNotes": {}
   },
   "people": [
     {
@@ -37,7 +37,7 @@
       "id": "amanda",
       "name": "Amanda C",
       "role": "Lead DS Eng",
-      "color": "#2DA05A"
+      "color": "#5c1376"
     },
     {
       "id": "emily",
@@ -74,13 +74,6 @@
       "textMode": "auto"
     },
     {
-      "id": "planned",
-      "label": "Planned",
-      "bg": "#13243A",
-      "fg": "#8FBCE8",
-      "textMode": "auto"
-    },
-    {
       "id": "next-up",
       "label": "Next up",
       "bg": "#1C2740",
@@ -89,36 +82,36 @@
     },
     {
       "id": "to-ticket",
-      "label": "To ticket",
-      "bg": "#0c325a",
+      "label": "In Production",
+      "bg": "#c69a5d",
       "fg": "#C4B5FD",
       "textMode": "auto"
     },
     {
       "id": "in-design",
-      "label": "In design",
-      "bg": "#131b58",
+      "label": "In Design",
+      "bg": "#598e91",
       "fg": "#CBB6FF",
       "textMode": "auto"
     },
     {
       "id": "in-development",
-      "label": "In development",
-      "bg": "#83531b",
+      "label": "In Development",
+      "bg": "#5c1376",
       "fg": "#5FD29A",
       "textMode": "auto"
     },
     {
       "id": "in-review",
       "label": "In review",
-      "bg": "#2E2410",
+      "bg": "#440f48",
       "fg": "#FFE07A",
       "textMode": "auto"
     },
     {
       "id": "done",
       "label": "Done",
-      "bg": "#01190d",
+      "bg": "#09021d",
       "fg": "#6FE0A0",
       "textMode": "auto"
     }
@@ -183,6 +176,11 @@
       "label": "DS Intake Request",
       "color": "#94420C",
       "icon": "🗂️"
+    },
+    {
+      "id": "new-workstream",
+      "label": "DM General",
+      "color": "#6366F1"
     }
   ],
   "items": [
@@ -195,7 +193,7 @@
       "handsOffTo": [
         "amanda"
       ],
-      "status": "in-design",
+      "status": "next-up",
       "start": "2026-06-18",
       "end": "2026-07-03",
       "linear": "",
@@ -213,7 +211,7 @@
       ],
       "status": "blocked",
       "start": "2026-06-15",
-      "end": "2026-06-19",
+      "end": "2026-06-18",
       "linear": "",
       "notes": "Pending",
       "blocking": []
@@ -229,7 +227,7 @@
       ],
       "status": "blocked",
       "start": "2026-06-15",
-      "end": "2026-06-19",
+      "end": "2026-06-18",
       "linear": "",
       "notes": "Pending",
       "blocking": []
@@ -245,7 +243,7 @@
       ],
       "status": "blocked",
       "start": "2026-06-15",
-      "end": "2026-06-19",
+      "end": "2026-06-18",
       "linear": "",
       "notes": "Pending",
       "blocking": []
@@ -259,12 +257,13 @@
       "handsOffTo": [
         "amanda"
       ],
-      "status": "in-design",
-      "start": "2026-07-13",
-      "end": "2026-07-17",
+      "status": "next-up",
+      "start": "2026-06-29",
+      "end": "2026-07-03",
       "linear": "",
       "notes": "",
-      "blocking": []
+      "blocking": [],
+      "track": 1
     },
     {
       "id": 12,
@@ -293,25 +292,9 @@
       ],
       "status": "blocked",
       "start": "2026-06-15",
-      "end": "2026-06-19",
+      "end": "2026-06-18",
       "linear": "",
       "notes": "Pending",
-      "blocking": []
-    },
-    {
-      "id": 15,
-      "phase": "P1",
-      "workstream": "type",
-      "title": "Figma: Type Token Remap + Cleanup",
-      "owner": "sami",
-      "handsOffTo": [
-        "amanda"
-      ],
-      "status": "in-design",
-      "start": "2026-06-29",
-      "end": "2026-07-04",
-      "linear": "",
-      "notes": "Label token cleanup — spec",
       "blocking": []
     },
     {
@@ -351,7 +334,7 @@
       "handsOffTo": [],
       "status": "in-development",
       "start": "2026-06-26",
-      "end": "2026-07-08",
+      "end": "2026-07-07",
       "linear": "",
       "notes": "",
       "blocking": []
@@ -363,12 +346,13 @@
       "title": "Component Updates in Code",
       "owner": "amanda",
       "handsOffTo": [],
-      "status": "to-ticket",
-      "start": "2026-07-20",
-      "end": "2026-07-25",
+      "status": "next-up",
+      "start": "2026-07-06",
+      "end": "2026-07-11",
       "linear": "",
       "notes": "",
-      "blocking": []
+      "blocking": [],
+      "track": 3
     },
     {
       "id": 24,
@@ -389,14 +373,15 @@
       "phase": "P1",
       "workstream": "brand",
       "title": "Gradient Illo: Update in Code",
-      "owner": "sami",
+      "owner": "alexa",
       "handsOffTo": [],
-      "status": "to-ticket",
-      "start": "2026-07-06",
-      "end": "2026-07-11",
+      "status": "next-up",
+      "start": "2026-06-29",
+      "end": "2026-07-04",
       "linear": "",
       "notes": "After Emily export",
-      "blocking": []
+      "blocking": [],
+      "track": 0
     },
     {
       "id": 26,
@@ -405,7 +390,7 @@
       "title": "Type Token Remap + Cleanup in Code",
       "owner": "amanda",
       "handsOffTo": [],
-      "status": "to-ticket",
+      "status": "next-up",
       "start": "2026-06-29",
       "end": "2026-07-02",
       "linear": "",
@@ -477,7 +462,7 @@
       "handsOffTo": [
         "amanda"
       ],
-      "status": "to-ticket",
+      "status": "next-up",
       "start": "2026-06-22",
       "end": "2026-06-26",
       "linear": "",
@@ -495,7 +480,7 @@
       ],
       "status": "blocked",
       "start": "2026-06-15",
-      "end": "2026-06-19",
+      "end": "2026-06-18",
       "linear": "",
       "notes": "Blocks type remap",
       "blocking": []
@@ -534,10 +519,10 @@
       "id": 36,
       "phase": "P1",
       "workstream": "color",
-      "title": "Add tickets for finalized decisions",
+      "title": "Add tickets for finalized blocked decisions",
       "owner": "sami",
       "handsOffTo": [],
-      "status": "to-ticket",
+      "status": "next-up",
       "start": "2026-06-22",
       "end": "2026-06-26",
       "linear": "",
@@ -551,26 +536,28 @@
       "title": "Figma: Color Token Migration",
       "owner": "sami",
       "handsOffTo": [],
-      "status": "in-design",
+      "status": "next-up",
       "start": "2026-06-29",
       "end": "2026-07-05",
       "linear": "",
       "notes": "",
-      "blocking": []
+      "blocking": [],
+      "track": 0
     },
     {
       "id": 38,
       "phase": "P1",
-      "workstream": "color",
+      "workstream": "type",
       "title": "Type Token Audit + Remapping Ticket",
       "owner": "sami",
       "handsOffTo": [],
       "status": "next-up",
       "start": "2026-06-22",
-      "end": "2026-06-26",
+      "end": "2026-06-28",
       "linear": "",
       "notes": "",
-      "blocking": []
+      "blocking": [],
+      "track": 1
     },
     {
       "id": 39,
@@ -593,7 +580,7 @@
       "title": "Gradient Back Removal Decisions",
       "owner": "emily",
       "handsOffTo": [],
-      "status": "backlog",
+      "status": "next-up",
       "start": "2026-06-22",
       "end": "2026-06-26",
       "linear": "",
@@ -607,12 +594,13 @@
       "title": "Update in Code Gradient Removal Decision",
       "owner": "amanda",
       "handsOffTo": [],
-      "status": "backlog",
-      "start": "2026-07-13",
-      "end": "2026-07-16",
+      "status": "next-up",
+      "start": "2026-07-08",
+      "end": "2026-07-10",
       "linear": "",
       "notes": "",
-      "blocking": []
+      "blocking": [],
+      "track": 1
     },
     {
       "id": 42,
@@ -630,9 +618,23 @@
     },
     {
       "id": 43,
-      "title": "Selector Card Disabled + text.disabled",
+      "title": "DS Intake Support",
       "phase": "new-phase",
       "workstream": "templates",
+      "owner": "sami",
+      "status": "in-design",
+      "start": "2026-06-15",
+      "end": "2026-07-17",
+      "linear": "",
+      "notes": "Selector Card Disabled + text.disabled",
+      "blocking": [],
+      "handsOffTo": []
+    },
+    {
+      "id": 44,
+      "title": "Redesign Support",
+      "phase": "P1",
+      "workstream": "new-workstream",
       "owner": "sami",
       "status": "in-design",
       "start": "2026-06-15",
@@ -643,17 +645,75 @@
       "handsOffTo": []
     },
     {
-      "id": 44,
-      "title": "Redesign figma support",
+      "id": 45,
+      "title": "Set up Type Ticket for Eng",
       "phase": "P1",
-      "workstream": "templates",
+      "workstream": "type",
       "owner": "sami",
-      "status": "in-design",
-      "start": "2026-06-15",
-      "end": "2026-06-18",
+      "status": "next-up",
+      "start": "2026-06-22",
+      "end": "2026-06-26",
       "linear": "",
       "notes": "",
       "blocking": [],
+      "handsOffTo": []
+    },
+    {
+      "id": 46,
+      "title": "VQA updates in code",
+      "phase": "P1",
+      "workstream": "new-workstream",
+      "owner": "amanda",
+      "status": "next-up",
+      "start": "2026-07-13",
+      "end": "2026-07-17",
+      "linear": "",
+      "notes": "",
+      "blocking": [],
+      "track": 0,
+      "handsOffTo": []
+    },
+    {
+      "id": 47,
+      "title": "Full VQA + Prep tickets for Eng",
+      "phase": "P1",
+      "workstream": "new-workstream",
+      "owner": "sami",
+      "status": "next-up",
+      "start": "2026-07-06",
+      "end": "2026-07-17",
+      "linear": "",
+      "notes": "",
+      "blocking": [],
+      "handsOffTo": []
+    },
+    {
+      "id": 48,
+      "title": "Eng Communication Support for Redesign Updates",
+      "phase": "P1",
+      "workstream": "new-workstream",
+      "owner": "isaac",
+      "status": "next-up",
+      "start": "2026-06-29",
+      "end": "2026-07-17",
+      "linear": "",
+      "notes": "",
+      "blocking": [],
+      "handsOffTo": []
+    },
+    {
+      "id": 49,
+      "title": "Product + Design Comms for Redesign Updates",
+      "phase": "P1",
+      "workstream": "new-workstream",
+      "owner": "alexa",
+      "status": "next-up",
+      "start": "2026-06-29",
+      "end": "2026-07-17",
+      "linear": "",
+      "notes": "",
+      "blocking": [],
+      "track": 2,
       "handsOffTo": []
     }
   ]
