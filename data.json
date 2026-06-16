@@ -14,7 +14,7 @@
         "text": "#e7f070"
       },
       "codeComplete": {
-        "color": "#6e6bff",
+        "color": "#7978b0",
         "label": "◆ Code Complete",
         "text": "#6e6bff"
       },
@@ -24,7 +24,11 @@
         "text": "#5FD29A"
       }
     },
-    "weekNotes": {}
+    "weekNotes": {
+      "2026-06-22": "Alexa + Amanda at Config 23-25",
+      "2026-06-15": "Amanda OOO + Holiday 06/19",
+      "2026-06-29": "Holiday 07/03"
+    }
   },
   "people": [
     {
@@ -76,7 +80,7 @@
     {
       "id": "next-up",
       "label": "Next up",
-      "bg": "#1C2740",
+      "bg": "#323948",
       "fg": "#A9C2F0",
       "textMode": "auto"
     },
@@ -90,14 +94,14 @@
     {
       "id": "in-design",
       "label": "In Design",
-      "bg": "#598e91",
+      "bg": "#8dbcbf",
       "fg": "#CBB6FF",
       "textMode": "auto"
     },
     {
       "id": "in-development",
       "label": "In Development",
-      "bg": "#5c1376",
+      "bg": "#8d4ca4",
       "fg": "#5FD29A",
       "textMode": "auto"
     },
@@ -111,7 +115,7 @@
     {
       "id": "done",
       "label": "Done",
-      "bg": "#09021d",
+      "bg": "#093b02",
       "fg": "#6FE0A0",
       "textMode": "auto"
     }
@@ -495,11 +499,12 @@
         "amanda"
       ],
       "status": "backlog",
-      "start": "2026-07-27",
-      "end": "2026-08-07",
+      "start": "2026-08-03",
+      "end": "2026-08-14",
       "linear": "",
       "notes": "Alerts/Forms/Loading/Onboarding",
-      "blocking": []
+      "blocking": [],
+      "track": 0
     },
     {
       "id": 34,
@@ -513,7 +518,8 @@
       "end": "2026-08-07",
       "linear": "",
       "notes": "TBD",
-      "blocking": []
+      "blocking": [],
+      "track": 1
     },
     {
       "id": 36,
@@ -567,11 +573,12 @@
       "owner": "sami",
       "handsOffTo": [],
       "status": "backlog",
-      "start": "2026-07-27",
-      "end": "2026-07-31",
+      "start": "2026-08-03",
+      "end": "2026-08-07",
       "linear": "",
       "notes": "",
-      "blocking": []
+      "blocking": [],
+      "track": 2
     },
     {
       "id": 40,
@@ -710,6 +717,36 @@
       "status": "next-up",
       "start": "2026-06-29",
       "end": "2026-07-17",
+      "linear": "",
+      "notes": "",
+      "blocking": [],
+      "track": 2,
+      "handsOffTo": []
+    },
+    {
+      "id": 50,
+      "title": "Flex Main Updates",
+      "phase": "P1",
+      "workstream": "new-workstream",
+      "owner": "sami",
+      "status": "next-up",
+      "start": "2026-07-20",
+      "end": "2026-07-31",
+      "linear": "",
+      "notes": "",
+      "blocking": [],
+      "track": 1,
+      "handsOffTo": []
+    },
+    {
+      "id": 51,
+      "title": "Figma Library Publish Updates",
+      "phase": "P1",
+      "workstream": "new-workstream",
+      "owner": "sami",
+      "status": "next-up",
+      "start": "2026-07-20",
+      "end": "2026-07-24",
       "linear": "",
       "notes": "",
       "blocking": [],
