@@ -107,7 +107,15 @@ function readableFg(hex) {
   const h = hex.replace('#','');
   const r = parseInt(h.substr(0,2),16), g = parseInt(h.substr(2,2),16), b = parseInt(h.substr(4,2),16);
   const lum = (0.299*r + 0.587*g + 0.114*b) / 255;
-  return lum > 0.55 ? '#111111' : '#f5f5f5';
+  return lum > 0.55 ? '#1A1A1A' : '#E9ECF3';
+}
+
+// Resolve a status's text color from its textMode (auto = contrast against bg).
+function statusFg(st) {
+  const mode = st.textMode || 'auto';
+  if (mode === 'light') return '#E9ECF3';
+  if (mode === 'dark')  return '#1A1A1A';
+  return readableFg(st.bg || '#222222');
 }
 
 function slugify(s) {
@@ -120,9 +128,19 @@ function escapeHtml(s) {
     ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 }
 
-// Color helpers for the editable column markers
-const MARKER_DEFAULTS = { today: '#6FB6F0', codeComplete: '#F2A24E', deploy: '#5FD29A' };
-function markerColor(key) { return (DATA.meta?.markerColors || {})[key] || MARKER_DEFAULTS[key]; }
+// Editable column markers — each is { color (highlight), label (badge text), text (header color) }
+const MARKER_DEFAULTS = {
+  today:        { color: '#6FB6F0', label: '● This week',     text: '#6FB6F0' },
+  codeComplete: { color: '#F2A24E', label: '◆ Code Complete', text: '#F2A24E' },
+  deploy:       { color: '#5FD29A', label: '🚀 Deploy',        text: '#5FD29A' },
+};
+function marker(key) {
+  const def = MARKER_DEFAULTS[key];
+  const v = (DATA.meta?.markerColors || {})[key];
+  if (v && typeof v === 'object') return { color: v.color || def.color, label: v.label || def.label, text: v.text || def.text };
+  if (typeof v === 'string') return { color: v, label: def.label, text: v };  // legacy
+  return { ...def };
+}
 function hexToRgb(h) { h = h.replace('#',''); return [parseInt(h.substr(0,2),16), parseInt(h.substr(2,2),16), parseInt(h.substr(4,2),16)]; }
 function mix(hex, withHex, t) { const a = hexToRgb(hex), b = hexToRgb(withHex); const m = a.map((v,i)=>Math.round(v+(b[i]-v)*t)); return `rgb(${m[0]},${m[1]},${m[2]})`; }
 function hexToRgba(hex, al) { const [r,g,b] = hexToRgb(hex); return `rgba(${r},${g},${b},${al})`; }
@@ -181,14 +199,16 @@ function renderWeekHeaders(weeks) {
     const isDep = w.getTime() === depWeek;
     const isToday = w.getTime() === todayWeek;
     // precedence: code-complete > deploy > today
-    let accent = null, badge = '';
-    if (isCC)        { accent = markerColor('codeComplete'); badge = '◆ Code Complete'; }
-    else if (isDep)  { accent = markerColor('deploy');       badge = '🚀 Deploy'; }
-    else if (isToday){ accent = markerColor('today');        badge = '● This week'; }
-    if (accent) {
+    let m = null;
+    if (isCC)        m = marker('codeComplete');
+    else if (isDep)  m = marker('deploy');
+    else if (isToday) m = marker('today');
+    let badge = '';
+    if (m) {
       div.classList.add('is-marker');
-      div.style.background = mix(accent, '#141414', 0.85);
-      div.style.color = accent;
+      div.style.background = mix(m.color, '#141414', 0.85);
+      div.style.color = m.text;
+      badge = m.label;
     }
     div.innerHTML = `
       <span class="week-label">${range}</span>
@@ -228,7 +248,7 @@ function renderFilters() {
   }
   makeGroup('filter-phase',      allPhases,   filters.phase,      v => phaseById(v)?.label || v);
   makeGroup('filter-status',     allStatuses, filters.status,     statusLabel,                 v => statusById(v)?.bg);
-  makeGroup('filter-workstream', allWS,       filters.workstream, v => `${wsById(v)?.icon || ''} ${wsById(v)?.label || v}`.trim(), v => wsById(v)?.color);
+  makeGroup('filter-workstream', allWS,       filters.workstream, v => `${wsById(v)?.icon || ''} ${wsById(v)?.label || v}`.trim());
 
   // active-filter count on the Filter button
   const count = filters.phase.size + filters.status.size + filters.workstream.size;
@@ -262,7 +282,7 @@ function renderLegend() {
     span.className = 'legend-swatch';
     span.textContent = s.label;
     span.style.background = s.bg;
-    span.style.color = 'var(--ink)';
+    span.style.color = statusFg(s);
     c.appendChild(span);
   });
 }
@@ -298,9 +318,9 @@ function renderSwimlanes(weeks) {
       const col = document.createElement('div');
       col.className = 'grid-col';
       let acc = null;
-      if (w.getTime() === ccWeek)       acc = markerColor('codeComplete');
-      else if (w.getTime() === depWeek) acc = markerColor('deploy');
-      else if (w.getTime() === todayWeek) acc = markerColor('today');
+      if (w.getTime() === ccWeek)       acc = marker('codeComplete').color;
+      else if (w.getTime() === depWeek) acc = marker('deploy').color;
+      else if (w.getTime() === todayWeek) acc = marker('today').color;
       if (acc) col.style.background = hexToRgba(acc, 0.06);
       grid.appendChild(col);
     });
@@ -364,10 +384,8 @@ function buildCard(item, weeks, track) {
   card.style.top    = (LANE_PAD + (track || 0) * (CARD_H + V_GAP)) + 'px';
   card.style.height = CARD_H + 'px';
   // colors are data-driven (statuses are editable)
-  if (st) { card.style.background = st.bg; }
-  card.style.color = 'var(--ink)';   // uniform cool off-white for title + status text
+  if (st) { card.style.background = st.bg; card.style.color = statusFg(st); }
   card.style.borderColor = 'rgba(255,255,255,0.1)';
-  if (ws) { card.style.borderLeft = `3px solid ${ws.color}`; }
 
   const wsIcon = ws?.icon ? `${ws.icon} ` : '';
   const lUrl = linearUrl(item.linear);
@@ -614,9 +632,6 @@ settingsOverlay.onclick = e => { if (e.target === settingsOverlay) closeSettings
 function openSettings() {
   document.getElementById('s-cc-date').value     = DATA.meta.codeCompleteDate || '';
   document.getElementById('s-deploy-date').value = DATA.meta.deployDate || '';
-  document.getElementById('m-today').value  = markerColor('today');
-  document.getElementById('m-cc').value     = markerColor('codeComplete');
-  document.getElementById('m-deploy').value = markerColor('deploy');
   renderSettingsLists();
   settingsOverlay.classList.remove('hidden');
 }
@@ -630,15 +645,6 @@ document.getElementById('s-deploy-date').onchange = e => {
   if (e.target.value) { DATA.meta.deployDate = e.target.value; save(); render(); }
 };
 
-// column marker colors commit immediately
-function setMarker(key, val) {
-  DATA.meta.markerColors = DATA.meta.markerColors || { ...MARKER_DEFAULTS };
-  DATA.meta.markerColors[key] = val;
-  save(); render();
-}
-document.getElementById('m-today').oninput  = e => setMarker('today', e.target.value);
-document.getElementById('m-cc').oninput     = e => setMarker('codeComplete', e.target.value);
-document.getElementById('m-deploy').oninput = e => setMarker('deploy', e.target.value);
 
 // count of items referencing a given list entry (for delete-safety)
 function usageCount(listKey, id) {
@@ -656,6 +662,73 @@ function renderSettingsLists() {
   renderSettingsList('workstreams', 'list-workstreams');
   renderSettingsList('statuses',    'list-statuses');
   renderSettingsList('phases',      'list-phases');
+  renderMarkerList();
+  renderPalette();
+}
+
+// after editing any color: persist, re-render the board, refresh the in-use palette
+function afterColorChange() { save(); render(); renderPalette(); }
+
+// A reusable [swatch + editable hex] control, two-way synced.
+function colorField(getHex, setHex) {
+  const wrap = document.createElement('span');
+  wrap.className = 'color-field';
+  const sw = document.createElement('input');
+  sw.type = 'color'; sw.value = getHex() || '#888888';
+  const hex = document.createElement('input');
+  hex.type = 'text'; hex.className = 'hex-input'; hex.value = getHex() || ''; hex.maxLength = 7; hex.spellcheck = false;
+  sw.oninput  = () => { hex.value = sw.value; setHex(sw.value); };
+  hex.oninput = () => { const v = hex.value.trim(); if (/^#[0-9a-fA-F]{6}$/.test(v)) { sw.value = v; setHex(v); } };
+  wrap.append(sw, hex);
+  return wrap;
+}
+
+// Column-marker rows (This week / Code complete / Deploy): color + label + text color
+function renderMarkerList() {
+  const c = document.getElementById('list-markers');
+  if (!c) return;
+  c.innerHTML = '';
+  DATA.meta.markerColors = DATA.meta.markerColors || JSON.parse(JSON.stringify(MARKER_DEFAULTS));
+  const rows = [['today','This week'], ['codeComplete','Code complete'], ['deploy','Deploy']];
+  rows.forEach(([key, name]) => {
+    const m = DATA.meta.markerColors[key] || { ...MARKER_DEFAULTS[key] };
+    DATA.meta.markerColors[key] = m;
+    const row = document.createElement('div');
+    row.className = 'settings-row';
+    row.appendChild(colorField(() => m.color, v => { m.color = v; afterColorChange(); }));
+    const label = document.createElement('input');
+    label.type = 'text'; label.value = m.label || ''; label.title = `${name} label`;
+    label.oninput = () => { m.label = label.value; save(); render(); };
+    row.appendChild(label);
+    const textWrap = colorField(() => m.text, v => { m.text = v; afterColorChange(); });
+    textWrap.title = 'Text color';
+    row.appendChild(textWrap);
+    c.appendChild(row);
+  });
+}
+
+// "Colors in use" palette — every distinct hex across people/status bg/markers; click to copy.
+function renderPalette() {
+  const c = document.getElementById('palette-swatches');
+  if (!c) return;
+  const hexes = new Set();
+  (DATA.people || []).forEach(p => p.color && hexes.add(p.color.toLowerCase()));
+  (DATA.statuses || []).forEach(s => s.bg && hexes.add(s.bg.toLowerCase()));
+  Object.values(DATA.meta.markerColors || {}).forEach(m => {
+    if (m && typeof m === 'object') { m.color && hexes.add(m.color.toLowerCase()); m.text && hexes.add(m.text.toLowerCase()); }
+  });
+  c.innerHTML = '';
+  [...hexes].sort().forEach(hx => {
+    const sw = document.createElement('button');
+    sw.className = 'palette-swatch';
+    sw.style.background = hx;
+    sw.innerHTML = `<span class="palette-hex">${hx}</span>`;
+    sw.title = 'Click to copy';
+    sw.onclick = () => navigator.clipboard?.writeText(hx).then(() => {
+      sw.classList.add('copied'); setTimeout(() => sw.classList.remove('copied'), 900);
+    });
+    c.appendChild(sw);
+  });
 }
 
 function renderSettingsList(listKey, containerId) {
@@ -665,16 +738,11 @@ function renderSettingsList(listKey, containerId) {
     const row = document.createElement('div');
     row.className = 'settings-row';
 
-    // color (people/workstreams use .color; statuses use .bg; phases have none)
-    const hasColor = listKey === 'people' || listKey === 'workstreams' || listKey === 'statuses';
-    if (hasColor) {
-      const colorKey = listKey === 'statuses' ? 'bg' : 'color';
-      const swatch = document.createElement('input');
-      swatch.type = 'color';
-      swatch.value = entry[colorKey] || '#888888';
-      swatch.title = 'Color';
-      swatch.oninput = () => { entry[colorKey] = swatch.value; save(); render(); };
-      row.appendChild(swatch);
+    // color control: people use .color, statuses use .bg; workstreams/phases have none
+    if (listKey === 'people') {
+      row.appendChild(colorField(() => entry.color, v => { entry.color = v; afterColorChange(); }));
+    } else if (listKey === 'statuses') {
+      row.appendChild(colorField(() => entry.bg, v => { entry.bg = v; afterColorChange(); }));
     } else {
       const spacer = document.createElement('span');
       spacer.className = 'swatch-spacer';
@@ -710,6 +778,17 @@ function renderSettingsList(listKey, containerId) {
       icon.maxLength = 4;
       icon.oninput = () => { entry.icon = icon.value; save(); render(); };
       row.appendChild(icon);
+    }
+
+    // text-color mode for statuses (auto-contrast / force light / force dark)
+    if (listKey === 'statuses') {
+      const sel = document.createElement('select');
+      sel.className = 'textmode-select';
+      sel.title = 'Text color';
+      sel.innerHTML = ['auto','light','dark'].map(m =>
+        `<option value="${m}" ${(entry.textMode||'auto')===m?'selected':''}>${m[0].toUpperCase()+m.slice(1)}</option>`).join('');
+      sel.onchange = () => { entry.textMode = sel.value; save(); render(); };
+      row.appendChild(sel);
     }
 
     // delete (with reassignment when in use)
@@ -928,10 +1007,24 @@ function migrate(data) {
 
   // v<6: default the editable column-marker colors (non-destructive — only if absent)
   if (v < 6 && !data.meta.markerColors) {
-    data.meta.markerColors = { ...(SEED?.meta?.markerColors || MARKER_DEFAULTS) };
+    data.meta.markerColors = JSON.parse(JSON.stringify(SEED?.meta?.markerColors || MARKER_DEFAULTS));
   }
 
-  data.meta.seedVersion = Math.max(v, SEED?.meta?.seedVersion ?? v, 6);
+  // v<7: status text mode + upgrade marker colors from string → {color,label,text}
+  if (v < 7) {
+    (data.statuses || []).forEach(s => { if (!s.textMode) s.textMode = 'auto'; });
+    const mc = data.meta.markerColors || {};
+    ['today','codeComplete','deploy'].forEach(k => {
+      const def = MARKER_DEFAULTS[k];
+      const cur = mc[k];
+      if (typeof cur === 'string')      mc[k] = { color: cur, label: def.label, text: cur };
+      else if (!cur || typeof cur !== 'object') mc[k] = { ...def };
+      else mc[k] = { color: cur.color || def.color, label: cur.label || def.label, text: cur.text || cur.color || def.text };
+    });
+    data.meta.markerColors = mc;
+  }
+
+  data.meta.seedVersion = Math.max(v, SEED?.meta?.seedVersion ?? v, 7);
 }
 
 // ─── Initial scroll to the current week (once) ────────────────────────────────

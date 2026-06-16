@@ -1,16 +1,28 @@
 {
   "meta": {
     "title": "Flex DS — Dark Matter Roadmap",
-    "seedVersion": 6,
+    "seedVersion": 7,
     "codeCompleteDate": "2026-07-24",
     "deployDate": "2026-07-29",
     "startDate": "2026-06-15",
     "timelineStart": "2026-06-01",
     "linearOrg": "get-flex",
     "markerColors": {
-      "today": "#6FB6F0",
-      "codeComplete": "#F2A24E",
-      "deploy": "#5FD29A"
+      "today": {
+        "color": "#6FB6F0",
+        "label": "● This week",
+        "text": "#6FB6F0"
+      },
+      "codeComplete": {
+        "color": "#F2A24E",
+        "label": "◆ Code Complete",
+        "text": "#F2A24E"
+      },
+      "deploy": {
+        "color": "#5FD29A",
+        "label": "🚀 Deploy",
+        "text": "#5FD29A"
+      }
     }
   },
   "people": [
@@ -50,55 +62,64 @@
       "id": "backlog",
       "label": "Backlog",
       "bg": "#242424",
-      "fg": "#AEB2BA"
+      "fg": "#AEB2BA",
+      "textMode": "auto"
     },
     {
       "id": "blocked",
       "label": "Blocked",
       "bg": "#321410",
-      "fg": "#F6A88F"
+      "fg": "#F6A88F",
+      "textMode": "auto"
     },
     {
       "id": "planned",
       "label": "Planned",
       "bg": "#13243A",
-      "fg": "#8FBCE8"
+      "fg": "#8FBCE8",
+      "textMode": "auto"
     },
     {
       "id": "next-up",
       "label": "Next up",
       "bg": "#1C2740",
-      "fg": "#A9C2F0"
+      "fg": "#A9C2F0",
+      "textMode": "auto"
     },
     {
       "id": "to-ticket",
       "label": "To ticket",
       "bg": "#0c325a",
-      "fg": "#C4B5FD"
+      "fg": "#C4B5FD",
+      "textMode": "auto"
     },
     {
       "id": "in-design",
       "label": "In design",
       "bg": "#131b58",
-      "fg": "#CBB6FF"
+      "fg": "#CBB6FF",
+      "textMode": "auto"
     },
     {
       "id": "in-development",
       "label": "In development",
       "bg": "#83531b",
-      "fg": "#5FD29A"
+      "fg": "#5FD29A",
+      "textMode": "auto"
     },
     {
       "id": "in-review",
       "label": "In review",
       "bg": "#2E2410",
-      "fg": "#FFE07A"
+      "fg": "#FFE07A",
+      "textMode": "auto"
     },
     {
       "id": "done",
       "label": "Done",
       "bg": "#01190d",
-      "fg": "#6FE0A0"
+      "fg": "#6FE0A0",
+      "textMode": "auto"
     }
   ],
   "phases": [
