@@ -69,13 +69,13 @@
       "id": "sami",
       "name": "Sami W",
       "role": "DS Designer + Ops",
-      "color": "#88e5f2"
+      "color": "#A1EEE6"
     },
     {
       "id": "amanda",
       "name": "Amanda C",
       "role": "Lead DS Eng",
-      "color": "#8d4ca4"
+      "color": "#381461"
     },
     {
       "id": "emily",
@@ -128,7 +128,7 @@
     {
       "id": "in-design",
       "label": "In Design",
-      "bg": "#88e5f2",
+      "bg": "#A1EEE6",
       "fg": "#CBB6FF",
       "textMode": "auto"
     },
