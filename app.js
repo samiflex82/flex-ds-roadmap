@@ -174,9 +174,44 @@ function render() {
   document.getElementById('timeline-outer').style.setProperty('--col-w', COL_W + 'px');
   const weeks = buildWeeks();
   renderWeekHeaders(weeks);
+  renderWeekNotes(weeks);
   renderFilters();
   renderLegend();
   renderSwimlanes(weeks);
+}
+
+// Per-week notes row (OOO / holidays), aligned to the week columns.
+function renderWeekNotes(weeks) {
+  const wrap = document.getElementById('week-notes');
+  if (!wrap) return;
+  DATA.meta.weekNotes = DATA.meta.weekNotes || {};
+  const notes = DATA.meta.weekNotes;
+  wrap.innerHTML = '';
+
+  const label = document.createElement('div');
+  label.className = 'notes-label';
+  label.textContent = '📝 Notes';
+  wrap.appendChild(label);
+
+  const track = document.createElement('div');
+  track.className = 'notes-track';
+  weeks.forEach(w => {
+    const iso = fmtDate(w);
+    const cell = document.createElement('input');
+    cell.className = 'note-cell';
+    cell.type = 'text';
+    cell.value = notes[iso] || '';
+    cell.placeholder = '—';
+    cell.title = 'OOO / holidays / notes for this week';
+    if (READONLY) cell.disabled = true;
+    else cell.oninput = () => {
+      const v = cell.value.trim();
+      if (v) notes[iso] = v; else delete notes[iso];
+      save();   // no re-render — keep focus while typing
+    };
+    track.appendChild(cell);
+  });
+  wrap.appendChild(track);
 }
 
 function renderWeekHeaders(weeks) {
@@ -247,7 +282,7 @@ function renderFilters() {
     });
   }
   makeGroup('filter-phase',      allPhases,   filters.phase,      v => phaseById(v)?.label || v);
-  makeGroup('filter-status',     allStatuses, filters.status,     statusLabel,                 v => statusById(v)?.bg);
+  makeGroup('filter-status',     allStatuses, filters.status,     statusLabel);
   makeGroup('filter-workstream', allWS,       filters.workstream, v => `${wsById(v)?.icon || ''} ${wsById(v)?.label || v}`.trim());
 
   // active-filter count on the Filter button
