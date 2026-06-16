@@ -1,7 +1,7 @@
 {
   "meta": {
     "title": "Flex DS — Dark Matter Roadmap",
-    "seedVersion": 7,
+    "seedVersion": 8,
     "codeCompleteDate": "2026-07-17",
     "deployDate": "2026-07-22",
     "startDate": "2026-06-15",
@@ -28,6 +28,40 @@
       "2026-06-22": "Alexa + Amanda at Config 23-25",
       "2026-06-15": "Amanda OOO + Holiday 06/19",
       "2026-06-29": "Holiday 07/03"
+    },
+    "milestones": [
+      {
+        "id": "cc",
+        "label": "◆ Code Complete",
+        "date": "2026-07-17",
+        "color": "#7978b0",
+        "text": "#6e6bff"
+      },
+      {
+        "id": "deploy",
+        "label": "🚀 Deploy",
+        "date": "2026-07-22",
+        "color": "#5FD29A",
+        "text": "#5FD29A"
+      },
+      {
+        "id": "cc2",
+        "label": "◆ P2 Code Complete",
+        "date": "2026-08-14",
+        "color": "#7978b0",
+        "text": "#6e6bff"
+      },
+      {
+        "id": "deploy2",
+        "label": "🚀 P2 Deploy",
+        "date": "2026-08-19",
+        "color": "#5FD29A",
+        "text": "#5FD29A"
+      }
+    ],
+    "todayMarker": {
+      "color": "#e7f070",
+      "text": "#e7f070"
     }
   },
   "people": [
@@ -198,11 +232,12 @@
         "amanda"
       ],
       "status": "next-up",
-      "start": "2026-06-18",
-      "end": "2026-07-03",
+      "start": "2026-06-17",
+      "end": "2026-06-26",
       "linear": "",
       "notes": "",
-      "blocking": []
+      "blocking": [],
+      "track": 4
     },
     {
       "id": 3,
@@ -265,9 +300,9 @@
       "start": "2026-06-29",
       "end": "2026-07-03",
       "linear": "",
-      "notes": "",
+      "notes": "Reskin only for Phase 1 of the components. \nPhase 2 is making changes like removing a line of text selector card.",
       "blocking": [],
-      "track": 1
+      "track": 2
     },
     {
       "id": 12,
@@ -399,7 +434,8 @@
       "end": "2026-07-02",
       "linear": "",
       "notes": "",
-      "blocking": []
+      "blocking": [],
+      "track": 1
     },
     {
       "id": 27,
@@ -409,11 +445,12 @@
       "owner": "amanda",
       "handsOffTo": [],
       "status": "next-up",
-      "start": "2026-07-07",
-      "end": "2026-07-11",
+      "start": "2026-07-06",
+      "end": "2026-07-10",
       "linear": "",
       "notes": "",
-      "blocking": []
+      "blocking": [],
+      "track": 2
     },
     {
       "id": 28,
@@ -422,40 +459,43 @@
       "title": "Margins + gaps",
       "owner": "amanda",
       "handsOffTo": [],
-      "status": "in-development",
+      "status": "next-up",
       "start": "2026-06-29",
       "end": "2026-07-02",
       "linear": "",
       "notes": "",
-      "blocking": []
+      "blocking": [],
+      "track": 2
     },
     {
       "id": 29,
       "phase": "P2",
       "workstream": "spacing",
       "title": "Component-level spacing tokens (semantic)",
-      "owner": "amanda",
+      "owner": "sami",
       "handsOffTo": [],
       "status": "backlog",
-      "start": "2026-07-27",
+      "start": "2026-08-03",
       "end": "2026-08-07",
       "linear": "",
       "notes": "",
-      "blocking": []
+      "blocking": [],
+      "track": 1
     },
     {
       "id": 30,
       "phase": "P2",
       "workstream": "color",
       "title": "Radii tokens",
-      "owner": "amanda",
+      "owner": "sami",
       "handsOffTo": [],
       "status": "backlog",
-      "start": "2026-07-27",
+      "start": "2026-08-03",
       "end": "2026-08-07",
       "linear": "",
       "notes": "",
-      "blocking": []
+      "blocking": [],
+      "track": 3
     },
     {
       "id": 31,
@@ -470,7 +510,7 @@
       "start": "2026-06-22",
       "end": "2026-06-26",
       "linear": "",
-      "notes": "From Sami container spec",
+      "notes": "Folder of all the illustration exports",
       "blocking": []
     },
     {
@@ -500,7 +540,7 @@
       ],
       "status": "backlog",
       "start": "2026-08-03",
-      "end": "2026-08-14",
+      "end": "2026-08-07",
       "linear": "",
       "notes": "Alerts/Forms/Loading/Onboarding",
       "blocking": [],
@@ -514,12 +554,12 @@
       "owner": "sami",
       "handsOffTo": [],
       "status": "backlog",
-      "start": "2026-08-03",
-      "end": "2026-08-07",
+      "start": "2026-08-24",
+      "end": "2026-09-22",
       "linear": "",
       "notes": "TBD",
       "blocking": [],
-      "track": 1
+      "track": 0
     },
     {
       "id": 36,
@@ -590,7 +630,7 @@
       "status": "next-up",
       "start": "2026-06-22",
       "end": "2026-06-26",
-      "linear": "",
+      "linear": "https://linear.app/get-flex/issue/DS-182/audit-of-all-the-places-that-were-removing-the-background-gradient-for#comment-0279c210",
       "notes": "",
       "blocking": []
     },
@@ -663,7 +703,8 @@
       "linear": "",
       "notes": "",
       "blocking": [],
-      "handsOffTo": []
+      "handsOffTo": [],
+      "track": 3
     },
     {
       "id": 46,
@@ -687,12 +728,13 @@
       "workstream": "new-workstream",
       "owner": "sami",
       "status": "next-up",
-      "start": "2026-07-06",
-      "end": "2026-07-17",
+      "start": "2026-06-29",
+      "end": "2026-07-03",
       "linear": "",
-      "notes": "",
+      "notes": "- make sure illustration left align doesn't look off",
       "blocking": [],
-      "handsOffTo": []
+      "handsOffTo": [],
+      "track": 1
     },
     {
       "id": 48,
@@ -702,7 +744,7 @@
       "owner": "isaac",
       "status": "next-up",
       "start": "2026-06-29",
-      "end": "2026-07-17",
+      "end": "2026-07-24",
       "linear": "",
       "notes": "",
       "blocking": [],
@@ -716,7 +758,7 @@
       "owner": "alexa",
       "status": "next-up",
       "start": "2026-06-29",
-      "end": "2026-07-17",
+      "end": "2026-07-24",
       "linear": "",
       "notes": "",
       "blocking": [],
@@ -731,11 +773,11 @@
       "owner": "sami",
       "status": "next-up",
       "start": "2026-07-20",
-      "end": "2026-07-31",
+      "end": "2026-07-24",
       "linear": "",
       "notes": "",
       "blocking": [],
-      "track": 1,
+      "track": 3,
       "handsOffTo": []
     },
     {
@@ -751,6 +793,35 @@
       "notes": "",
       "blocking": [],
       "track": 2,
+      "handsOffTo": []
+    },
+    {
+      "id": 52,
+      "title": "Supporting building PRs for smaller VQA updates",
+      "phase": "P1",
+      "workstream": "new-workstream",
+      "owner": "sami",
+      "status": "next-up",
+      "start": "2026-07-06",
+      "end": "2026-07-24",
+      "linear": "",
+      "notes": "",
+      "blocking": [],
+      "handsOffTo": []
+    },
+    {
+      "id": 53,
+      "title": "Supporting building PRs for smaller VQA updates",
+      "phase": "P1",
+      "workstream": "new-workstream",
+      "owner": "alexa",
+      "status": "next-up",
+      "start": "2026-07-06",
+      "end": "2026-07-24",
+      "linear": "",
+      "notes": "",
+      "blocking": [],
+      "track": 0,
       "handsOffTo": []
     }
   ]

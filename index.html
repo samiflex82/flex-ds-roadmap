@@ -83,13 +83,6 @@
       <h2>Manage lists</h2>
       <div id="settings-body">
         <section class="settings-section">
-          <h3>Key dates</h3>
-          <div class="keydates-grid">
-            <label>Code complete<input id="s-cc-date" type="date" /></label>
-            <label>Deployment<input id="s-deploy-date" type="date" /></label>
-          </div>
-        </section>
-        <section class="settings-section">
           <h3>People <button class="add-row" data-list="people">+ Add</button></h3>
           <div id="list-people" class="settings-list"></div>
         </section>
@@ -110,8 +103,9 @@
           <div id="palette-swatches" class="palette"></div>
         </section>
         <section class="settings-section">
-          <h3>Column markers</h3>
-          <div id="list-markers" class="settings-list"></div>
+          <h3>Milestones <button id="btn-add-milestone" class="add-row">+ Add milestone</button></h3>
+          <div id="today-marker" class="settings-list"></div>
+          <div id="list-milestones" class="settings-list"></div>
         </section>
       </div>
       <div class="modal-actions">

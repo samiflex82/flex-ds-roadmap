@@ -38,9 +38,10 @@ function weekStart(refDate) {
 // Weeks array: Monday dates spanning start→end of all items + some buffer
 function buildWeeks() {
   const allDates = DATA.items.flatMap(i => [parseDate(i.start), parseDate(i.end)]);
-  allDates.push(parseDate(DATA.meta.codeCompleteDate), parseDate(DATA.meta.deployDate));
+  (DATA.meta.milestones || []).forEach(m => { if (m.date) allDates.push(parseDate(m.date)); });
   if (DATA.meta.timelineStart) allDates.push(parseDate(DATA.meta.timelineStart));
   if (DATA.meta.timelineEnd)   allDates.push(parseDate(DATA.meta.timelineEnd));
+  if (!allDates.length) allDates.push(new Date());
   const earliest = weekStart(new Date(Math.min(...allDates)));
   const latest   = weekStart(new Date(Math.max(...allDates)));
   const weeks = [];
@@ -128,18 +129,25 @@ function escapeHtml(s) {
     ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
 }
 
-// Editable column markers — each is { color (highlight), label (badge text), text (header color) }
+// Column markers: a list of dated milestones + a computed current-week ("today") highlight.
+const TODAY_DEFAULT = { color: '#6FB6F0', text: '#6FB6F0' };
+// Legacy defaults — only referenced by the v<7 migration branches that upgrade old data.
 const MARKER_DEFAULTS = {
   today:        { color: '#6FB6F0', label: '● This week',     text: '#6FB6F0' },
   codeComplete: { color: '#F2A24E', label: '◆ Code Complete', text: '#F2A24E' },
   deploy:       { color: '#5FD29A', label: '🚀 Deploy',        text: '#5FD29A' },
 };
-function marker(key) {
-  const def = MARKER_DEFAULTS[key];
-  const v = (DATA.meta?.markerColors || {})[key];
-  if (v && typeof v === 'object') return { color: v.color || def.color, label: v.label || def.label, text: v.text || def.text };
-  if (typeof v === 'string') return { color: v, label: def.label, text: v };  // legacy
-  return { ...def };
+function milestones()  { return DATA.meta?.milestones || []; }
+function todayMarker() { const t = DATA.meta?.todayMarker; return { color: t?.color || TODAY_DEFAULT.color, text: t?.text || TODAY_DEFAULT.text }; }
+// weekStartMs → milestone (first milestone whose week matches)
+function milestonesByWeek() {
+  const map = {};
+  milestones().forEach(m => {
+    if (!m.date) return;
+    const k = weekStart(parseDate(m.date)).getTime();
+    if (!(k in map)) map[k] = m;
+  });
+  return map;
 }
 function hexToRgb(h) { h = h.replace('#',''); return [parseInt(h.substr(0,2),16), parseInt(h.substr(2,2),16), parseInt(h.substr(4,2),16)]; }
 function mix(hex, withHex, t) { const a = hexToRgb(hex), b = hexToRgb(withHex); const m = a.map((v,i)=>Math.round(v+(b[i]-v)*t)); return `rgb(${m[0]},${m[1]},${m[2]})`; }
@@ -215,11 +223,9 @@ function renderWeekNotes(weeks) {
 }
 
 function renderWeekHeaders(weeks) {
-  const ccDate = parseDate(DATA.meta.codeCompleteDate);
-  const depDate = parseDate(DATA.meta.deployDate);
-  const ccWeek  = weekStart(ccDate).getTime();
-  const depWeek = weekStart(depDate).getTime();
+  const msByWeek = milestonesByWeek();
   const todayWeek = weekStart(new Date()).getTime();
+  const today = todayMarker();
 
   const container = document.getElementById('week-headers');
   container.innerHTML = '';
@@ -230,24 +236,19 @@ function renderWeekHeaders(weeks) {
     div.className = 'week-col';
     const fri = addDays(w, 4);
     const range = `${fmt(w)} → ${fmt(fri)}`;
-    const isCC  = w.getTime() === ccWeek;
-    const isDep = w.getTime() === depWeek;
-    const isToday = w.getTime() === todayWeek;
-    // precedence: code-complete > deploy > today
-    let m = null;
-    if (isCC)        m = marker('codeComplete');
-    else if (isDep)  m = marker('deploy');
-    else if (isToday) m = marker('today');
-    let badge = '';
-    if (m) {
+    // precedence: a dated milestone wins over the current-week highlight
+    const ms = msByWeek[w.getTime()];
+    let color = null, text = null, badge = '';
+    if (ms)                              { color = ms.color; text = ms.text; badge = ms.label || ''; }
+    else if (w.getTime() === todayWeek)  { color = today.color; text = today.text; badge = '● This week'; }
+    if (color) {
       div.classList.add('is-marker');
-      div.style.background = mix(m.color, '#141414', 0.85);
-      div.style.color = m.text;
-      badge = m.label;
+      div.style.background = mix(color, '#141414', 0.85);
+      div.style.color = text;
     }
     div.innerHTML = `
       <span class="week-label">${range}</span>
-      ${badge ? `<span class="week-badge">${badge}</span>` : ''}
+      ${badge ? `<span class="week-badge">${escapeHtml(badge)}</span>` : ''}
     `;
     container.appendChild(div);
   });
@@ -327,9 +328,9 @@ function renderSwimlanes(weeks) {
   container.innerHTML = '';
 
   const items = visibleItems();
-  const ccWeek  = weekStart(parseDate(DATA.meta.codeCompleteDate)).getTime();
-  const depWeek = weekStart(parseDate(DATA.meta.deployDate)).getTime();
+  const msByWeek = milestonesByWeek();
   const todayWeek = weekStart(new Date()).getTime();
+  const today = todayMarker();
 
   DATA.people.forEach(person => {
     const personItems = items.filter(i => i.owner === person.id);
@@ -352,10 +353,8 @@ function renderSwimlanes(weeks) {
     weeks.forEach(w => {
       const col = document.createElement('div');
       col.className = 'grid-col';
-      let acc = null;
-      if (w.getTime() === ccWeek)       acc = marker('codeComplete').color;
-      else if (w.getTime() === depWeek) acc = marker('deploy').color;
-      else if (w.getTime() === todayWeek) acc = marker('today').color;
+      const ms = msByWeek[w.getTime()];
+      const acc = ms ? ms.color : (w.getTime() === todayWeek ? today.color : null);
       if (acc) col.style.background = hexToRgba(acc, 0.06);
       grid.appendChild(col);
     });
@@ -665,21 +664,10 @@ document.getElementById('settings-close').onclick = closeSettings;
 settingsOverlay.onclick = e => { if (e.target === settingsOverlay) closeSettings(); };
 
 function openSettings() {
-  document.getElementById('s-cc-date').value     = DATA.meta.codeCompleteDate || '';
-  document.getElementById('s-deploy-date').value = DATA.meta.deployDate || '';
   renderSettingsLists();
   settingsOverlay.classList.remove('hidden');
 }
 function closeSettings() { settingsOverlay.classList.add('hidden'); }
-
-// key-date inputs commit immediately
-document.getElementById('s-cc-date').onchange = e => {
-  if (e.target.value) { DATA.meta.codeCompleteDate = e.target.value; save(); render(); }
-};
-document.getElementById('s-deploy-date').onchange = e => {
-  if (e.target.value) { DATA.meta.deployDate = e.target.value; save(); render(); }
-};
-
 
 // count of items referencing a given list entry (for delete-safety)
 function usageCount(listKey, id) {
@@ -697,7 +685,8 @@ function renderSettingsLists() {
   renderSettingsList('workstreams', 'list-workstreams');
   renderSettingsList('statuses',    'list-statuses');
   renderSettingsList('phases',      'list-phases');
-  renderMarkerList();
+  renderTodayMarker();
+  renderMilestoneList();
   renderPalette();
 }
 
@@ -718,28 +707,64 @@ function colorField(getHex, setHex) {
   return wrap;
 }
 
-// Column-marker rows (This week / Code complete / Deploy): color + label + text color
-function renderMarkerList() {
-  const c = document.getElementById('list-markers');
+// "This week" current-week highlight color (no date — it's computed).
+function renderTodayMarker() {
+  const c = document.getElementById('today-marker');
   if (!c) return;
   c.innerHTML = '';
-  DATA.meta.markerColors = DATA.meta.markerColors || JSON.parse(JSON.stringify(MARKER_DEFAULTS));
-  const rows = [['today','This week'], ['codeComplete','Code complete'], ['deploy','Deploy']];
-  rows.forEach(([key, name]) => {
-    const m = DATA.meta.markerColors[key] || { ...MARKER_DEFAULTS[key] };
-    DATA.meta.markerColors[key] = m;
+  const t = DATA.meta.todayMarker = DATA.meta.todayMarker || { ...TODAY_DEFAULT };
+  const row = document.createElement('div');
+  row.className = 'settings-row';
+  row.appendChild(colorField(() => t.color, v => { t.color = v; afterColorChange(); }));
+  const name = document.createElement('span');
+  name.className = 'milestone-name'; name.textContent = '● This week (current)';
+  row.appendChild(name);
+  const textWrap = colorField(() => t.text, v => { t.text = v; afterColorChange(); });
+  textWrap.title = 'Text color';
+  row.appendChild(textWrap);
+  c.appendChild(row);
+}
+
+// Milestone rows: date + label + highlight color + text color + delete. "+ Add" appends one.
+function renderMilestoneList() {
+  const c = document.getElementById('list-milestones');
+  if (!c) return;
+  c.innerHTML = '';
+  DATA.meta.milestones = DATA.meta.milestones || [];
+  DATA.meta.milestones.forEach((m, idx) => {
     const row = document.createElement('div');
     row.className = 'settings-row';
-    row.appendChild(colorField(() => m.color, v => { m.color = v; afterColorChange(); }));
+
+    const date = document.createElement('input');
+    date.type = 'date'; date.value = m.date || ''; date.className = 'milestone-date';
+    date.onchange = () => { m.date = date.value; save(); render(); };
+    row.appendChild(date);
+
     const label = document.createElement('input');
-    label.type = 'text'; label.value = m.label || ''; label.title = `${name} label`;
+    label.type = 'text'; label.value = m.label || ''; label.placeholder = 'Label';
     label.oninput = () => { m.label = label.value; save(); render(); };
     row.appendChild(label);
+
+    row.appendChild(colorField(() => m.color, v => { m.color = v; afterColorChange(); }));
     const textWrap = colorField(() => m.text, v => { m.text = v; afterColorChange(); });
     textWrap.title = 'Text color';
     row.appendChild(textWrap);
+
+    const del = document.createElement('button');
+    del.className = 'row-delete'; del.textContent = '✕'; del.title = 'Delete milestone';
+    del.onclick = () => { DATA.meta.milestones.splice(idx, 1); save(); renderMilestoneList(); render(); };
+    row.appendChild(del);
+
     c.appendChild(row);
   });
+}
+
+// + Add milestone
+function addMilestone() {
+  DATA.meta.milestones = DATA.meta.milestones || [];
+  const today = fmtDate(new Date());
+  DATA.meta.milestones.push({ id: 'm-' + Math.abs(hashStr(today + DATA.meta.milestones.length)), label: '◆ Milestone', date: today, color: '#7978b0', text: '#6e6bff' });
+  save(); renderMilestoneList(); render();
 }
 
 // "Colors in use" palette — every distinct hex across people/status bg/markers; click to copy.
@@ -749,9 +774,8 @@ function renderPalette() {
   const hexes = new Set();
   (DATA.people || []).forEach(p => p.color && hexes.add(p.color.toLowerCase()));
   (DATA.statuses || []).forEach(s => s.bg && hexes.add(s.bg.toLowerCase()));
-  Object.values(DATA.meta.markerColors || {}).forEach(m => {
-    if (m && typeof m === 'object') { m.color && hexes.add(m.color.toLowerCase()); m.text && hexes.add(m.text.toLowerCase()); }
-  });
+  (DATA.meta.milestones || []).forEach(m => { m.color && hexes.add(m.color.toLowerCase()); m.text && hexes.add(m.text.toLowerCase()); });
+  const t = DATA.meta.todayMarker; if (t) { t.color && hexes.add(t.color.toLowerCase()); t.text && hexes.add(t.text.toLowerCase()); }
   c.innerHTML = '';
   [...hexes].sort().forEach(hx => {
     const sw = document.createElement('button');
@@ -879,8 +903,12 @@ function reassignAndDelete(listKey, fromId, toId) {
   DATA[listKey] = DATA[listKey].filter(e => e.id !== fromId);
 }
 
-// + Add buttons
+// + Add milestone button
+document.getElementById('btn-add-milestone').onclick = addMilestone;
+
+// + Add buttons (people/workstreams/statuses/phases)
 document.querySelectorAll('.add-row').forEach(btn => {
+  if (!btn.dataset.list) return;   // skip the milestone add button (handled above)
   btn.onclick = () => {
     const listKey = btn.dataset.list;
     const baseLabel = { people:'New person', workstreams:'New workstream',
@@ -1059,7 +1087,23 @@ function migrate(data) {
     data.meta.markerColors = mc;
   }
 
-  data.meta.seedVersion = Math.max(v, SEED?.meta?.seedVersion ?? v, 7);
+  // v<8: convert single code-complete/deploy markers → a milestones list + todayMarker
+  if (v < 8) {
+    if (!data.meta.milestones) {
+      const mc = data.meta.markerColors || {};
+      const cc = mc.codeComplete || {}, dep = mc.deploy || {};
+      const ms = [];
+      if (data.meta.codeCompleteDate) ms.push({ id:'cc',     label: cc.label  || '◆ Code Complete', date: data.meta.codeCompleteDate, color: cc.color  || '#7978b0', text: cc.text  || '#6e6bff' });
+      if (data.meta.deployDate)       ms.push({ id:'deploy', label: dep.label || '🚀 Deploy',        date: data.meta.deployDate,       color: dep.color || '#5FD29A', text: dep.text || '#5FD29A' });
+      data.meta.milestones = ms;
+    }
+    if (!data.meta.todayMarker) {
+      const t = (data.meta.markerColors || {}).today;
+      data.meta.todayMarker = { color: t?.color || TODAY_DEFAULT.color, text: t?.text || TODAY_DEFAULT.text };
+    }
+  }
+
+  data.meta.seedVersion = Math.max(v, SEED?.meta?.seedVersion ?? v, 8);
 }
 
 // ─── Initial scroll to the current week (once) ────────────────────────────────
