@@ -232,12 +232,12 @@
         "amanda"
       ],
       "status": "in-design",
-      "start": "2026-06-17",
-      "end": "2026-06-26",
+      "start": "2026-06-29",
+      "end": "2026-07-08",
       "linear": "",
       "notes": "",
       "blocking": [],
-      "track": 6
+      "track": 3
     },
     {
       "id": 3,
@@ -282,7 +282,7 @@
       "handsOffTo": [
         "sami"
       ],
-      "status": "blocked",
+      "status": "done",
       "start": "2026-06-15",
       "end": "2026-06-18",
       "linear": "",
@@ -332,7 +332,7 @@
       "handsOffTo": [
         "sami"
       ],
-      "status": "blocked",
+      "status": "done",
       "start": "2026-06-15",
       "end": "2026-06-18",
       "linear": "",
@@ -439,7 +439,7 @@
       "linear": "",
       "notes": "",
       "blocking": [],
-      "track": 1
+      "track": 2
     },
     {
       "id": 27,
@@ -469,7 +469,7 @@
       "linear": "",
       "notes": "",
       "blocking": [],
-      "track": 2
+      "track": 3
     },
     {
       "id": 29,
@@ -616,11 +616,11 @@
       "phase": "P1",
       "workstream": "color",
       "title": "Figma: Icons",
-      "owner": "sami",
+      "owner": "emily",
       "handsOffTo": [],
       "status": "backlog",
-      "start": "2026-08-24",
-      "end": "2026-08-28",
+      "start": "2026-06-29",
+      "end": "2026-07-22",
       "linear": "",
       "notes": "",
       "blocking": [],
@@ -677,7 +677,7 @@
       "owner": "sami",
       "status": "in-design",
       "start": "2026-06-15",
-      "end": "2026-07-17",
+      "end": "2026-07-24",
       "linear": "",
       "notes": "Selector Card Disabled + text.disabled",
       "blocking": [],
@@ -690,7 +690,7 @@
       "workstream": "new-workstream",
       "owner": "sami",
       "status": "in-design",
-      "start": "2026-06-15",
+      "start": "2026-06-16",
       "end": "2026-06-18",
       "linear": "",
       "notes": "",
@@ -725,7 +725,7 @@
       "linear": "",
       "notes": "",
       "blocking": [],
-      "track": 0,
+      "track": 1,
       "handsOffTo": []
     },
     {
@@ -735,13 +735,13 @@
       "workstream": "new-workstream",
       "owner": "sami",
       "status": "next-up",
-      "start": "2026-06-29",
-      "end": "2026-07-03",
+      "start": "2026-07-06",
+      "end": "2026-07-10",
       "linear": "",
       "notes": "- make sure illustration left align doesn't look off",
       "blocking": [],
       "handsOffTo": [],
-      "track": 1
+      "track": 2
     },
     {
       "id": 48,
@@ -814,7 +814,8 @@
       "linear": "",
       "notes": "",
       "blocking": [],
-      "handsOffTo": []
+      "handsOffTo": [],
+      "track": 1
     },
     {
       "id": 53,
@@ -861,7 +862,7 @@
     },
     {
       "id": 56,
-      "title": "Create ticket updates for blocked final decisions",
+      "title": "Create ticket updates from review",
       "phase": "P1",
       "workstream": "new-workstream",
       "owner": "sami",
@@ -871,7 +872,7 @@
       "linear": "",
       "notes": "",
       "blocking": [],
-      "track": 5,
+      "track": 4,
       "handsOffTo": []
     },
     {
@@ -901,6 +902,51 @@
       "notes": "",
       "blocking": [],
       "track": 1,
+      "handsOffTo": []
+    },
+    {
+      "id": 59,
+      "title": "BD Support",
+      "phase": "new-phase",
+      "workstream": "templates",
+      "owner": "emily",
+      "status": "to-ticket",
+      "start": "2026-06-15",
+      "end": "2026-07-24",
+      "linear": "",
+      "notes": "",
+      "blocking": [],
+      "track": 0,
+      "handsOffTo": []
+    },
+    {
+      "id": 60,
+      "title": "DS Eng Support",
+      "phase": "new-phase",
+      "workstream": "templates",
+      "owner": "amanda",
+      "status": "in-development",
+      "start": "2026-06-15",
+      "end": "2026-07-24",
+      "linear": "",
+      "notes": "",
+      "blocking": [],
+      "track": 0,
+      "handsOffTo": []
+    },
+    {
+      "id": 61,
+      "title": "Documentation of Phase 1 Updates",
+      "phase": "P1",
+      "workstream": "new-workstream",
+      "owner": "sami",
+      "status": "backlog",
+      "start": "2026-07-13",
+      "end": "2026-07-17",
+      "linear": "",
+      "notes": "",
+      "blocking": [],
+      "track": 2,
       "handsOffTo": []
     }
   ]
